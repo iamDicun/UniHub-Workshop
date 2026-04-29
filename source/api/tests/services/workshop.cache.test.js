@@ -1,9 +1,11 @@
-import { calculateCacheTTL, getCachedWorkshop, setCachedWorkshop, deleteCachedWorkshop } from './workshop.cache.js';
-import { getRedisClient } from '../config/redis.js';
+import { jest } from '@jest/globals';
 
-jest.mock('../config/redis.js', () => ({
+jest.unstable_mockModule('../../src/config/redis.js', () => ({
   getRedisClient: jest.fn(),
 }));
+
+const { getRedisClient } = await import('../../src/config/redis.js');
+const { calculateCacheTTL, getCachedWorkshop, setCachedWorkshop, deleteCachedWorkshop } = await import('../../src/services/workshop.cache.js');
 
 describe('workshop.cache.js', () => {
   let mockClient;
@@ -27,13 +29,13 @@ describe('workshop.cache.js', () => {
       const now = new Date();
       const workshop = {
         created_at: now.toISOString(),
-        start_time: new Date(now.getTime() + 86400000).toISOString(), // 1 day later
+        start_time: new Date(now.getTime() + 86400000).toISOString(),
         end_time: new Date(now.getTime() + 90000000).toISOString()
       };
       
       const ttl = calculateCacheTTL(workshop);
       expect(ttl).toBeGreaterThan(0);
-      expect(ttl).toBeLessThanOrEqual(3600); // Default 3600
+      expect(ttl).toBeLessThanOrEqual(3600);
     });
   });
 

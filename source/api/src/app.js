@@ -3,6 +3,9 @@ import cors from 'cors';
 import helmet from 'helmet';
 import healthRoutes from './routes/health.routes.js';
 import authRoutes from './routes/auth.routes.js';
+import workshopRoutes from './routes/workshop.routes.js';
+import registrationRoutes from './routes/registration.routes.js';
+import checkinRoutes from './routes/checkin.routes.js';
 
 const app = express();
 
@@ -20,6 +23,9 @@ app.use((req, res, next) => {
 
 app.use('/api/health', healthRoutes);
 app.use('/api/auth', authRoutes);
+app.use('/api/workshops', workshopRoutes);
+app.use('/api/registrations', registrationRoutes);
+app.use('/api/checkins', checkinRoutes);
 
 app.use((err, req, res, next) => {
   console.error(err.stack);

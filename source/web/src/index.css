@@ -1,20 +1,54 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap');
 
 @import "tailwindcss";
 
 @theme {
-  --color-brand-50: oklch(0.985 0.005 275);
-  --color-brand-100: oklch(0.96 0.01 275);
-  --color-brand-200: oklch(0.92 0.01 275);
-  --color-brand-500: oklch(0.45 0.2 275);
-  --color-brand-600: oklch(0.38 0.18 275);
-  --color-brand-900: oklch(0.25 0.02 275);
-  
-  --font-sans: 'Inter', -apple-system, sans-serif;
+  --color-brand-50: oklch(0.98 0.02 192);
+  --color-brand-100: oklch(0.95 0.03 192);
+  --color-brand-200: oklch(0.9 0.04 192);
+  --color-brand-500: oklch(0.55 0.13 192);
+  --color-brand-600: oklch(0.47 0.12 192);
+  --color-brand-900: oklch(0.22 0.03 192);
+
+  --font-sans: 'Space Grotesk', 'Segoe UI', sans-serif;
+  --font-display: 'Fraunces', 'Space Grotesk', serif;
 }
 
 @layer base {
   body {
-    @apply bg-brand-50 text-brand-900 antialiased;
+    @apply text-brand-900 antialiased;
+    min-height: 100vh;
+    background-color: oklch(0.97 0.02 192);
+    background-image:
+      radial-gradient(circle at top, rgba(88, 176, 192, 0.18), transparent 55%),
+      linear-gradient(135deg, rgba(251, 247, 238, 0.8), rgba(236, 248, 245, 0.9));
+  }
+}
+
+@layer utilities {
+  .font-display {
+    font-family: var(--font-display);
+  }
+
+  .animate-rise {
+    animation: rise 0.45s ease-out both;
+  }
+
+  .text-fade {
+    position: relative;
+    white-space: nowrap;
+    overflow: hidden;
+    mask-image: linear-gradient(to right, black 85%, transparent 100%);
+  }
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }

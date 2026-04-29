@@ -1,4 +1,3 @@
-import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { findUserByEmail, findUserById } from '../repositories/user.repository.js';
 
@@ -12,7 +11,7 @@ export const loginUser = async (email, password) => {
     throw error;
   }
 
-  const isMatch = await bcrypt.compare(password, user.password_hash);
+  const isMatch = password === user.password_hash;
   if (!isMatch) {
     const error = new Error('Mật khẩu không chính xác!');
     error.statusCode = 401;

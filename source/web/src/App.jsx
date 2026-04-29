@@ -1,14 +1,70 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Login from './pages/Login';
+import StudentDashboard from './pages/StudentDashboard';
+import AdminWorkshops from './pages/AdminWorkshops';
+import StaffDashboard from './pages/StaffDashboard';
+import Profile from './pages/Profile';
+import { getHomeForRole, getStoredUser } from './utils/auth';
+
+const RoleRoute = ({ roles, children }) => {
+  const user = getStoredUser();
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
+  if (roles && !roles.includes(user.role)) {
+    return <Navigate to={getHomeForRole(user.role)} replace />;
+  }
+  return children;
+};
+
+const HomeRedirect = () => {
+  const user = getStoredUser();
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
+  return <Navigate to={getHomeForRole(user.role)} replace />;
+};
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
         <Route path="/login" element={<Login />} />
-        {/* Mặc định chuyển hướng về /login cho đến khi có Dashboard */}
-        <Route path="*" element={<Navigate to="/login" replace />} />
+        <Route
+          path="/student"
+          element={
+            <RoleRoute roles={['student']}>
+              <StudentDashboard />
+            </RoleRoute>
+          }
+        />
+        <Route
+          path="/admin"
+          element={
+            <RoleRoute roles={['admin']}>
+              <AdminWorkshops />
+            </RoleRoute>
+          }
+        />
+        <Route
+          path="/staff"
+          element={
+            <RoleRoute roles={['staff']}>
+              <StaffDashboard />
+            </RoleRoute>
+          }
+        />
+        <Route
+          path="/profile"
+          element={
+            <RoleRoute roles={['student', 'admin', 'staff']}>
+              <Profile />
+            </RoleRoute>
+          }
+        />
+        <Route path="/" element={<HomeRedirect />} />
+        <Route path="*" element={<HomeRedirect />} />
       </Routes>
     </BrowserRouter>
   );

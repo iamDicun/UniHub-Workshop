@@ -1,0 +1,35 @@
+name: Mobile App Build
+
+on:
+  push:
+    branches: [ "main" ]
+    paths:
+      - 'source/app/**' # Chỉ kích hoạt khi có thay đổi trong thư mục app
+
+jobs:
+  build-apk:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./source/app
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Setup Expo
+        uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Install dependencies
+        run: npm install
+
+      # Lệnh này sẽ build trên server của Expo, tạo ra file APK và in ra link tải trong log của GitHub Actions.
+      - name: Build Android APK
+        run: eas build --platform android --profile preview --non-interactive

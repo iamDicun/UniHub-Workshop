@@ -1,0 +1,46 @@
+name: Backend (API) CI/CD
+
+on:
+  push:
+    branches: [ "main" ]
+    paths:
+      - 'source/api/**'
+      - 'source/.docker/api.Dockerfile'
+  pull_request:
+    branches: [ "main" ]
+    paths:
+      - 'source/api/**'
+
+jobs:
+  test-and-build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./source/api
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Use Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          
+      - name: Install dependencies
+        run: npm install
+        
+      - name: Run Linter
+        run: npm run lint
+        
+      - name: Run Tests
+        run: npm test
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+        
+      - name: Build API Image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./source
+          file: ./source/.docker/api.Dockerfile
+          push: false # Đổi thành true để push lên DockerHub/GHCR
+          tags: unihub-api:latest

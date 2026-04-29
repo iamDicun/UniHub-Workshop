@@ -1,0 +1,71 @@
+version: '3.8'
+
+services:
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./config/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - api1
+      - api2
+      - web
+    networks:
+      - unihub-network
+    restart: always
+
+  api1:
+    image: your-registry/unihub-api:latest 
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - DATABASE_URL=${DATABASE_URL}
+      - REDIS_URL=redis://redis:6379
+      - RABBITMQ_URL=amqp://rabbitmq:5672
+    depends_on:
+      - redis
+      - rabbitmq
+    networks:
+      - unihub-network
+    restart: always
+
+  api2:
+    image: your-registry/unihub-api:latest
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - DATABASE_URL=${DATABASE_URL}
+      - REDIS_URL=redis://redis:6379
+      - RABBITMQ_URL=amqp://rabbitmq:5672
+    depends_on:
+      - redis
+      - rabbitmq
+    networks:
+      - unihub-network
+    restart: always
+
+  web:
+    image: your-registry/unihub-web:latest
+    networks:
+      - unihub-network
+    restart: always
+
+  redis:
+    image: redis:7-alpine
+    networks:
+      - unihub-network
+    restart: always
+
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    ports:
+      - "15672:15672"
+    networks:
+      - unihub-network
+    restart: always
+
+networks:
+  unihub-network:
+    driver: bridge

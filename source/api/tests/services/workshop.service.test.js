@@ -1,13 +1,29 @@
-import { createWorkshop } from './workshop.service.js';
-import * as repo from '../repositories/workshop.repository.js';
-import * as cache from './workshop.cache.js';
-import pool from '../config/db.js';
+import { jest } from '@jest/globals';
 
-jest.mock('../repositories/workshop.repository.js');
-jest.mock('./workshop.cache.js');
-jest.mock('../config/db.js', () => ({
-  query: jest.fn()
+jest.unstable_mockModule('../../src/repositories/workshop.repository.js', () => ({
+  createWorkshop: jest.fn(),
+  updateWorkshop: jest.fn(),
+  deleteWorkshop: jest.fn(),
+  getWorkshopById: jest.fn(),
+  getWorkshopByIdForUser: jest.fn(),
+  listWorkshopsForUser: jest.fn(),
+  listWorkshopRegistrations: jest.fn(),
+  getUserRegistrationForWorkshop: jest.fn()
 }));
+
+jest.unstable_mockModule('../../src/services/workshop.cache.js', () => ({
+  getCachedWorkshop: jest.fn(),
+  setCachedWorkshop: jest.fn(),
+  deleteCachedWorkshop: jest.fn()
+}));
+
+jest.unstable_mockModule('../../src/config/db.js', () => ({
+  default: { query: jest.fn() }
+}));
+
+const repo = await import('../../src/repositories/workshop.repository.js');
+const cache = await import('../../src/services/workshop.cache.js');
+const { createWorkshop } = await import('../../src/services/workshop.service.js');
 
 describe('workshop.service.js', () => {
   afterEach(() => {

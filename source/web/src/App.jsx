@@ -1,27 +1,16 @@
-import React, { useEffect, useState } from 'react';
-import { checkHealth } from './api/client.js';
+import React from 'react';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import Login from './pages/Login';
 
 function App() {
-  const [health, setHealth] = useState(null);
-
-  useEffect(() => {
-    checkHealth()
-      .then(data => setHealth(data))
-      .catch(err => console.error(err));
-  }, []);
-
   return (
-    <div>
-      <h1>UniHub Workshop</h1>
-      <div>
-        <h2>API Status</h2>
-        {health ? (
-          <pre>{JSON.stringify(health, null, 2)}</pre>
-        ) : (
-          <p>Loading...</p>
-        )}
-      </div>
-    </div>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/login" element={<Login />} />
+        {/* Mặc định chuyển hướng về /login cho đến khi có Dashboard */}
+        <Route path="*" element={<Navigate to="/login" replace />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 

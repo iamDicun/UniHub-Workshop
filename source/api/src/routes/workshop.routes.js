@@ -14,6 +14,7 @@ import {
 } from '../controllers/workshopStaff.controller.js';
 import { registerWorkshop } from '../controllers/registration.controller.js';
 import { protect, authorize } from '../middlewares/auth.middleware.js';
+import { slidingWindowRateLimiter } from '../middlewares/rateLimiter.middleware.js';
 
 const router = Router();
 
@@ -23,7 +24,9 @@ router.get('/:id/registrations', protect, authorize('admin'), getWorkshopRegistr
 router.post('/', protect, authorize('admin'), createWorkshopHandler);
 router.put('/:id', protect, authorize('admin'), updateWorkshopHandler);
 router.delete('/:id', protect, authorize('admin'), deleteWorkshopHandler);
-router.post('/:id/register', protect, authorize('student'), registerWorkshop);
+
+// Áp dụng Rate Limiting: Tối đa 2 request mỗi 10 giây cho hành động đăng ký
+router.post('/:id/register', protect, authorize('student'), slidingWindowRateLimiter(2, 10000), registerWorkshop);
 
 router.get('/:id/staff', protect, authorize('admin'), getWorkshopStaffHandler);
 router.post('/:id/staff', protect, authorize('admin'), addWorkshopStaffHandler);

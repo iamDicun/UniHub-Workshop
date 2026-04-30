@@ -1,7 +1,20 @@
 import app from './app.js';
+import { connectRedis } from './config/redis.js';
+import { connectRabbitMQ } from './config/rabbitmq.js';
+import { startNotificationWorker } from './queue/notification.worker.js';
 
 const PORT = process.env.PORT || 3000;
 
-app.listen(PORT, () => {
-  console.log(`Server listening on port ${PORT}`);
-});
+const startServer = async () => {
+  await connectRedis();
+  await connectRabbitMQ();
+  
+  // Khởi động các Worker chạy ngầm
+  startNotificationWorker();
+  
+  app.listen(PORT, () => {
+    console.log(`Server listening on port ${PORT}`);
+  });
+};
+
+startServer();

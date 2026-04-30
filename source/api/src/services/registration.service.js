@@ -13,6 +13,7 @@ import {
 } from '../repositories/registration.repository.js';
 import { findCheckinByRegistrationId } from '../repositories/checkin.repository.js';
 import { deleteCachedWorkshop, setCachedWorkshop } from './workshop.cache.js';
+import { publishRegistrationEvent } from '../queue/notification.producer.js';
 
 const buildError = (message, statusCode = 400) => {
   const error = new Error(message);
@@ -53,6 +54,13 @@ export const registerForWorkshop = async (workshopId, studentId) => {
     if (updatedWorkshop) {
       await setCachedWorkshop(updatedWorkshop);
     }
+
+    // Đẩy sự kiện vào RabbitMQ để gửi Email không đồng bộ
+    await publishRegistrationEvent({
+      studentId: studentId,
+      workshopId: workshopId,
+      registrationId: registration.id
+    });
 
     return {
       registration_id: registration.id,

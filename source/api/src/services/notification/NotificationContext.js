@@ -10,8 +10,14 @@ export default class NotificationContext {
 
   // Chạy đồng loạt tất cả các kênh
   async notifyAll(recipient, data) {
-    const promises = this.strategies.map((strategy) => strategy.send(recipient, data));
-    // Dùng allSettled để nếu 1 kênh lỗi (VD: SMS lỗi) thì kênh khác (Email) vẫn gửi bình thường
-    await Promise.allSettled(promises);
+    const results = await Promise.allSettled(this.strategies.map((strategy) => strategy.send(recipient, data)));
+    
+    // Tìm các kênh bị lỗi
+    const failures = results.filter(r => r.status === 'rejected');
+    
+    if (failures.length > 0) {
+      // Throw lỗi của kênh đầu tiên để Worker bắt được và kích hoạt cơ chế Retry
+      throw failures[0].reason;
+    }
   }
 }

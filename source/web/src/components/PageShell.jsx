@@ -28,6 +28,30 @@ const PageShell = ({ title, subtitle, actions, children }) => {
             <span className="rounded-full bg-brand-100 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-brand-700">
               {roleLabel}
             </span>
+            {user?.role === 'student' && (
+              <Link
+                to="/student/payments"
+                className="rounded-full border border-brand-200 px-4 py-2 text-sm font-semibold text-brand-700 transition hover:border-brand-500 hover:text-brand-900"
+              >
+                Giao dịch
+              </Link>
+            )}
+            {user?.role === 'admin' && (
+              <>
+                <Link
+                  to="/admin/payments"
+                  className="rounded-full border border-brand-200 px-4 py-2 text-sm font-semibold text-brand-700 transition hover:border-brand-500 hover:text-brand-900"
+                >
+                  Giao dịch
+                </Link>
+                <Link
+                  to="/admin/failed-jobs"
+                  className="rounded-full bg-red-100 px-4 py-2 text-sm font-semibold text-red-700 transition hover:bg-red-200"
+                >
+                  DLQ (Email Lỗi)
+                </Link>
+              </>
+            )}
             <Link
               to="/profile"
               className="rounded-full border border-brand-200 px-4 py-2 text-sm font-semibold text-brand-700 transition hover:border-brand-500 hover:text-brand-900"

@@ -30,10 +30,17 @@ jest.unstable_mockModule('../../src/config/db.js', () => ({
   }
 }));
 
+jest.unstable_mockModule('../../src/config/payos.breaker.js', () => ({
+  payosCircuitBreaker: {
+    fire: jest.fn()
+  }
+}));
+
 const repo = await import('../../src/repositories/registration.repository.js');
 const workshopRepo = await import('../../src/repositories/workshop.repository.js');
 const checkinRepo = await import('../../src/repositories/checkin.repository.js');
 const cache = await import('../../src/services/workshop.cache.js');
+const { payosCircuitBreaker } = await import('../../src/config/payos.breaker.js');
 const pool = (await import('../../src/config/db.js')).default;
 const { registerForWorkshop, cancelRegistration } = await import('../../src/services/registration.service.js');
 
@@ -54,23 +61,30 @@ describe('registration.service.js', () => {
 
   describe('registerForWorkshop', () => {
     it('should register successfully', async () => {
-      workshopRepo.getWorkshopForUpdate.mockResolvedValue({ id: 1 });
+      workshopRepo.getWorkshopForUpdate.mockResolvedValue({ id: 1, price: 50000 });
       repo.findRegistrationByStudentAndWorkshop.mockResolvedValue(null);
-      workshopRepo.decrementSeats.mockResolvedValue(true);
-      repo.createRegistration.mockResolvedValue({ id: 1, status: 'confirmed', workshop_id: 1 });
-      workshopRepo.getWorkshopById.mockResolvedValue({ id: 1 });
+      repo.createRegistration.mockResolvedValue({ id: 1, status: 'pending', workshop_id: 1 });
+      workshopRepo.getWorkshopById.mockResolvedValue({ id: 1, price: 50000 });
+      mockClient.query.mockImplementation((sql) => {
+        if (String(sql).includes('INSERT INTO payments')) {
+          return Promise.resolve({ rows: [{ id: 99, order_code: 123 }] });
+        }
+        return Promise.resolve({});
+      });
+      payosCircuitBreaker.fire.mockResolvedValue({ checkoutUrl: 'https://checkout.test', paymentLinkId: 'pl_1' });
 
       const result = await registerForWorkshop(1, 1);
       
       expect(result.registration_id).toBe(1);
+      expect(result.checkout_url).toBe('https://checkout.test');
       expect(mockClient.query).toHaveBeenCalledWith('COMMIT');
       expect(cache.setCachedWorkshop).toHaveBeenCalled();
     });
 
     it('should throw if workshop is full', async () => {
-      workshopRepo.getWorkshopForUpdate.mockResolvedValue({ id: 1 });
+      workshopRepo.getWorkshopForUpdate.mockResolvedValue({ id: 1, price: 50000 });
       repo.findRegistrationByStudentAndWorkshop.mockResolvedValue(null);
-      workshopRepo.decrementSeats.mockResolvedValue(false);
+      repo.createRegistration.mockRejectedValue(new Error('Workshop da het cho'));
 
       await expect(registerForWorkshop(1, 1)).rejects.toThrow('Workshop da het cho');
     });

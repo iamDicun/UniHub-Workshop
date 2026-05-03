@@ -24,6 +24,14 @@ export const findRegistrationForCancel = async (registrationId, studentId, db) =
   return rows[0];
 };
 
+export const getRegistrationByIdForUpdate = async (registrationId, db) => {
+  const { rows } = await getDb(db).query(
+    `SELECT * FROM registrations WHERE id = $1 FOR UPDATE`,
+    [registrationId]
+  );
+  return rows[0];
+};
+
 export const getRegistrationById = async (registrationId, db) => {
   const { rows } = await getDb(db).query(
     `SELECT id, student_id, workshop_id, status

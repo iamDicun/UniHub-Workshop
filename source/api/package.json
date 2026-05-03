@@ -13,6 +13,7 @@
     "prepare": "cd .. && husky install api/.husky"
   },
   "dependencies": {
+    "@payos/node": "^2.0.5",
     "amqplib": "^0.10.4",
     "bcryptjs": "^3.0.3",
     "cors": "^2.8.5",
@@ -21,6 +22,7 @@
     "helmet": "^7.1.0",
     "jsonwebtoken": "^9.0.3",
     "nodemailer": "^8.0.7",
+    "opossum": "^9.0.0",
     "pg": "^8.11.5",
     "redis": "^4.6.13"
   },

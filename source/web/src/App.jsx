@@ -3,6 +3,9 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Login from './pages/Login';
 import StudentDashboard from './pages/StudentDashboard';
 import AdminWorkshops from './pages/AdminWorkshops';
+import AdminFailedJobs from './pages/AdminFailedJobs';
+import AdminPayments from './pages/AdminPayments';
+import StudentPayments from './pages/StudentPayments';
 import StaffDashboard from './pages/StaffDashboard';
 import Profile from './pages/Profile';
 import { getHomeForRole, getStoredUser } from './utils/auth';
@@ -40,10 +43,34 @@ function App() {
           }
         />
         <Route
+          path="/student/payments"
+          element={
+            <RoleRoute roles={['student']}>
+              <StudentPayments />
+            </RoleRoute>
+          }
+        />
+        <Route
           path="/admin"
           element={
             <RoleRoute roles={['admin']}>
               <AdminWorkshops />
+            </RoleRoute>
+          }
+        />
+        <Route
+          path="/admin/failed-jobs"
+          element={
+            <RoleRoute roles={['admin']}>
+              <AdminFailedJobs />
+            </RoleRoute>
+          }
+        />
+        <Route
+          path="/admin/payments"
+          element={
+            <RoleRoute roles={['admin']}>
+              <AdminPayments />
             </RoleRoute>
           }
         />

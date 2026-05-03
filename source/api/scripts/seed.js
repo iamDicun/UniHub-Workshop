@@ -55,6 +55,70 @@ CREATE TABLE IF NOT EXISTS registrations (
   CONSTRAINT unique_registration UNIQUE (student_id, workshop_id)
 );
 
+CREATE OR REPLACE FUNCTION sync_workshop_available_seats()
+RETURNS TRIGGER AS $$
+DECLARE
+  old_active BOOLEAN;
+  new_active BOOLEAN;
+BEGIN
+  old_active := TG_OP IN ('UPDATE', 'DELETE') AND OLD.status IN ('pending', 'confirmed');
+  new_active := TG_OP IN ('INSERT', 'UPDATE') AND NEW.status IN ('pending', 'confirmed');
+
+  IF TG_OP = 'INSERT' THEN
+    IF new_active THEN
+      UPDATE workshops
+      SET available_seats = available_seats - 1
+      WHERE id = NEW.workshop_id AND available_seats > 0;
+      IF NOT FOUND THEN
+        RAISE EXCEPTION 'Workshop da het cho';
+      END IF;
+    END IF;
+    RETURN NEW;
+  END IF;
+
+  IF TG_OP = 'DELETE' THEN
+    IF old_active THEN
+      UPDATE workshops
+      SET available_seats = available_seats + 1
+      WHERE id = OLD.workshop_id;
+    END IF;
+    RETURN OLD;
+  END IF;
+
+  IF TG_OP = 'UPDATE' THEN
+    IF old_active AND NOT new_active THEN
+      UPDATE workshops
+      SET available_seats = available_seats + 1
+      WHERE id = OLD.workshop_id;
+    ELSIF NOT old_active AND new_active THEN
+      UPDATE workshops
+      SET available_seats = available_seats - 1
+      WHERE id = NEW.workshop_id AND available_seats > 0;
+      IF NOT FOUND THEN
+        RAISE EXCEPTION 'Workshop da het cho';
+      END IF;
+    END IF;
+    RETURN NEW;
+  END IF;
+
+  RETURN NULL;
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS trg_sync_workshop_available_seats ON registrations;
+CREATE TRIGGER trg_sync_workshop_available_seats
+AFTER INSERT OR UPDATE OR DELETE ON registrations
+FOR EACH ROW
+EXECUTE FUNCTION sync_workshop_available_seats();
+
+UPDATE workshops w
+SET available_seats = w.capacity - COALESCE((
+  SELECT COUNT(*)
+  FROM registrations r
+  WHERE r.workshop_id = w.id
+    AND r.status IN ('pending', 'confirmed')
+), 0);
+
 -- =========================
 -- WORKSHOP STAFFS
 -- =========================

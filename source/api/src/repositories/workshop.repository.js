@@ -76,7 +76,7 @@ export const getWorkshopById = async (workshopId, db) => {
 
 export const getWorkshopForUpdate = async (workshopId, db) => {
   const { rows } = await getDb(db).query(
-    'SELECT id, capacity, available_seats FROM workshops WHERE id = $1 FOR UPDATE',
+    'SELECT id, capacity, available_seats, price FROM workshops WHERE id = $1 FOR UPDATE',
     [workshopId]
   );
   return rows[0];

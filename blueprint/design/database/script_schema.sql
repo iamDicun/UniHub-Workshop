@@ -65,6 +65,70 @@ CREATE TABLE IF NOT EXISTS registrations (
     UNIQUE (student_id, workshop_id)
 );
 
+CREATE OR REPLACE FUNCTION sync_workshop_available_seats()
+RETURNS TRIGGER AS $$
+DECLARE
+  old_active BOOLEAN;
+  new_active BOOLEAN;
+BEGIN
+  old_active := TG_OP IN ('UPDATE', 'DELETE') AND OLD.status IN ('pending', 'confirmed');
+  new_active := TG_OP IN ('INSERT', 'UPDATE') AND NEW.status IN ('pending', 'confirmed');
+
+  IF TG_OP = 'INSERT' THEN
+    IF new_active THEN
+      UPDATE workshops
+      SET available_seats = available_seats - 1
+      WHERE id = NEW.workshop_id AND available_seats > 0;
+      IF NOT FOUND THEN
+        RAISE EXCEPTION 'Workshop da het cho';
+      END IF;
+    END IF;
+    RETURN NEW;
+  END IF;
+
+  IF TG_OP = 'DELETE' THEN
+    IF old_active THEN
+      UPDATE workshops
+      SET available_seats = available_seats + 1
+      WHERE id = OLD.workshop_id;
+    END IF;
+    RETURN OLD;
+  END IF;
+
+  IF TG_OP = 'UPDATE' THEN
+    IF old_active AND NOT new_active THEN
+      UPDATE workshops
+      SET available_seats = available_seats + 1
+      WHERE id = OLD.workshop_id;
+    ELSIF NOT old_active AND new_active THEN
+      UPDATE workshops
+      SET available_seats = available_seats - 1
+      WHERE id = NEW.workshop_id AND available_seats > 0;
+      IF NOT FOUND THEN
+        RAISE EXCEPTION 'Workshop da het cho';
+      END IF;
+    END IF;
+    RETURN NEW;
+  END IF;
+
+  RETURN NULL;
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS trg_sync_workshop_available_seats ON registrations;
+CREATE TRIGGER trg_sync_workshop_available_seats
+AFTER INSERT OR UPDATE OR DELETE ON registrations
+FOR EACH ROW
+EXECUTE FUNCTION sync_workshop_available_seats();
+
+UPDATE workshops w
+SET available_seats = w.capacity - COALESCE((
+  SELECT COUNT(*)
+  FROM registrations r
+  WHERE r.workshop_id = w.id
+    AND r.status IN ('pending', 'confirmed')
+), 0);
+
 -- =========================
 -- WORKSHOP STAFFS (Phân quyền Check-in)
 -- =========================
@@ -83,7 +147,7 @@ CREATE TABLE IF NOT EXISTS payments (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   registration_id UUID NOT NULL,
   amount DECIMAL NOT NULL CHECK (amount >= 0),
-  status TEXT NOT NULL CHECK (status IN ('pending', 'success', 'failed')),
+  status TEXT NOT NULL CHECK (status IN ('pending', 'paid', 'failed', 'expired')),
   idempotency_key TEXT UNIQUE, -- Cơ sở để chống trừ tiền hai lần
   created_at TIMESTAMP DEFAULT NOW(),
 
@@ -190,3 +254,25 @@ $$ LANGUAGE plpgsql;
 -- Apply trigger ví dụ
 -- CREATE TRIGGER trg_users_timestamp BEFORE INSERT ON users
 -- FOR EACH ROW EXECUTE FUNCTION update_timestamp();
+
+
+CREATE TABLE IF NOT EXISTS failed_jobs (
+  id SERIAL PRIMARY KEY,
+  payload JSONB NOT NULL,
+  error_message TEXT,
+  failed_at TIMESTAMP DEFAULT NOW(),
+  status TEXT DEFAULT 'failed'
+  constraint failed_jobs_pkey primary key (id)
+) TABLESPACE pg_default;
+
+-- Thêm/Sửa bảng payments
+ALTER TABLE payments ADD COLUMN IF NOT EXISTS order_code SERIAL; -- Tự động tăng, dùng làm mã đơn hàng cho PayOS
+ALTER TABLE payments ADD COLUMN IF NOT EXISTS external_id TEXT;  -- Lưu paymentLinkId từ PayOS
+ALTER TABLE payments ADD COLUMN IF NOT EXISTS checkout_url TEXT; -- Lưu link thanh toán để user truy cập lại
+ALTER TABLE payments ADD COLUMN IF NOT EXISTS description TEXT;  -- Mô tả thanh toán (PayOS giới hạn 25 ký tự)
+
+-- Cập nhật CHECK constraint cho status để khớp với các trạng thái của cổng thanh toán
+-- (Lưu ý: Nếu bảng đã có dữ liệu, việc sửa CONSTRAINT cần cẩn thận)
+-- Thay vì chỉ thêm cột, hãy thêm ràng buộc UNIQUE và INDEX
+ALTER TABLE payments ADD COLUMN IF NOT EXISTS order_code SERIAL UNIQUE;
+CREATE INDEX IF NOT EXISTS idx_payments_order_code ON payments(order_code);

@@ -94,4 +94,30 @@ export const removeWorkshopStaff = async (workshopId, staffId) => {
   return response.data;
 };
 
+// ============================
+// FAILED JOBS API (Admin Only)
+// ============================
+export const getFailedJobs = async () => {
+  const response = await apiClient.get('/failed-jobs');
+  return response.data;
+};
+
+export const retryFailedJob = async (jobId) => {
+  const response = await apiClient.post(`/failed-jobs/${jobId}/retry`);
+  return response.data;
+};
+
+// ============================
+// PAYMENTS API
+// ============================
+export const fetchMyPayments = async () => {
+  const response = await apiClient.get('/payments/my-payments');
+  return response.data;
+};
+
+export const fetchAdminPayments = async () => {
+  const response = await apiClient.get('/payments');
+  return response.data;
+};
+
 export default apiClient;

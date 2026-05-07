@@ -118,9 +118,34 @@ const StudentDashboard = () => {
     setBusyId(workshopId);
     setError('');
     try {
-      await registerWorkshop(workshopId);
-      await loadWorkshops();
+      const res = await registerWorkshop(workshopId);
+      console.log('[handleRegister] Response:', res);
+      const payload = res?.data ?? res;
+      console.log('[handleRegister] Payload:', payload);
+
+      if (payload.checkout_url) {
+        console.log('[handleRegister] Redirecting to:', payload.checkout_url);
+        // Store order code in localStorage for cancel handling
+        if (payload.order_code) {
+          localStorage.setItem('pendingOrderCode', payload.order_code);
+          console.log('[handleRegister] Stored order code:', payload.order_code);
+        }
+        window.location.href = payload.checkout_url;
+      } else {
+        console.log('[handleRegister] No checkout_url, checking for message...');
+        if (payload.message) {
+          console.log('[handleRegister] Setting error:', payload.message);
+          // Hiển thị popup thông báo ngay
+          alert(payload.message);
+          setError(payload.message);
+        } else {
+          console.log('[handleRegister] Closing detail modal');
+          closeDetail();
+        }
+        await loadWorkshops();
+      }
     } catch (err) {
+      console.error('[handleRegister] Error:', err);
       setError(err.response?.data?.message || 'Đăng ký thất bại.');
     } finally {
       setBusyId(null);
@@ -250,6 +275,11 @@ const StudentDashboard = () => {
       >
         {selectedWorkshop ? (
           <div className="grid gap-5">
+            {error && (
+              <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 animate-in fade-in slide-in-from-top-1">
+                {error}
+              </div>
+            )}
             <section className="grid gap-3 rounded-3xl border border-brand-200/70 bg-white/80 p-5">
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div>
@@ -319,8 +349,26 @@ const StudentDashboard = () => {
               </div>
             ) : null}
 
+            {selectedWorkshop.registration_status === 'pending' ? (
+              <div className="rounded-2xl border border-yellow-200/70 bg-yellow-50 px-4 py-3 text-sm text-yellow-900">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="font-semibold">Đang chờ thanh toán</span>
+                </div>
+                <p>Bạn đã đăng ký nhưng chưa hoàn tất thanh toán. Vui lòng thanh toán để xác nhận giữ chỗ.</p>
+                <div className="mt-4 text-center">
+                  <button
+                    onClick={() => handleRegister(selectedWorkshop.id)}
+                    disabled={busyId === selectedWorkshop.id}
+                    className="rounded-full bg-yellow-500 px-5 py-2 text-white font-semibold hover:bg-yellow-600 transition"
+                  >
+                    {busyId === selectedWorkshop.id ? 'Đang tải...' : 'Tiếp tục thanh toán'}
+                  </button>
+                </div>
+              </div>
+            ) : null}
+
             <div className="flex flex-wrap gap-3">
-              {selectedWorkshop.registration_status === 'confirmed' ? (
+              {selectedWorkshop.registration_status === 'confirmed' || selectedWorkshop.registration_status === 'pending' ? (
                 <button
                   type="button"
                   onClick={() => handleCancel(selectedWorkshop.registration_id)}

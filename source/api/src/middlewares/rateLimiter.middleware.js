@@ -35,7 +35,7 @@ const slidingWindowLuaScript = `
 export const slidingWindowRateLimiter = (limit, windowMs) => {
   return async (req, res, next) => {
     const client = getRedisClient();
-    
+
     // Fallback: Nếu Redis sập, cho phép đi qua luôn (Graceful Degradation)
     if (!client?.isOpen) {
       return next();
@@ -76,6 +76,47 @@ export const slidingWindowRateLimiter = (limit, windowMs) => {
     } catch (error) {
       console.error('Rate Limiter Error:', error);
       // Fallback cho qua nếu có lỗi eval script
+      return next();
+    }
+  };
+};
+
+/**
+ * Middleware Global Rate Limiting
+ */
+export const globalRateLimiter = (limit, windowMs) => {
+  return async (req, res, next) => {
+    const client = getRedisClient();
+
+    if (!client?.isOpen) {
+      return next();
+    }
+
+    const key = `ratelimit:global:${req.originalUrl}`;
+    const now = Date.now();
+    const randomId = `${now}-${Math.random().toString(36).substring(2)}`;
+
+    try {
+      const result = await client.eval(
+        slidingWindowLuaScript,
+        {
+          keys: [key],
+          arguments: [now.toString(), windowMs.toString(), limit.toString(), randomId]
+        }
+      );
+
+      const [allowed, remaining] = result;
+
+      if (allowed === 1) {
+        return next();
+      } else {
+        return res.status(429).json({
+          status: 'error',
+          message: 'Hệ thống đang quá tải, vui lòng thử lại sau.'
+        });
+      }
+    } catch (error) {
+      console.error('Global Rate Limiter Error:', error);
       return next();
     }
   };

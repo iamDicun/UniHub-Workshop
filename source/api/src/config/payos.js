@@ -19,9 +19,9 @@ if (typeof PayOS !== 'function') {
 }
 
 const payos = new PayOS(
-  process.env.PAYOS_CLIENT_ID,
-  process.env.PAYOS_API_KEY,
-  process.env.PAYOS_CHECKSUM_KEY
+  process.env.PAYOS_CLIENT_ID || 'mock_client_id',
+  process.env.PAYOS_API_KEY || 'mock_api_key',
+  process.env.PAYOS_CHECKSUM_KEY || 'mock_checksum_key'
 );
 
 if (!payos.verifyPaymentWebhookData && payos.webhooks?.verify) {

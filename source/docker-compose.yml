@@ -26,8 +26,6 @@ services:
       - DATABASE_URL=${DATABASE_URL}
       - REDIS_URL=redis://redis:6379
       - RABBITMQ_URL=amqp://rabbitmq:5672
-    env_file:
-      - .env
     depends_on:
       redis:
         condition: service_healthy
@@ -47,8 +45,6 @@ services:
       - DATABASE_URL=${DATABASE_URL}
       - REDIS_URL=redis://redis:6379
       - RABBITMQ_URL=amqp://rabbitmq:5672
-    env_file:
-      - .env
     depends_on:
       redis:
         condition: service_healthy
@@ -68,8 +64,6 @@ services:
       - DATABASE_URL=${DATABASE_URL}
       - REDIS_URL=redis://redis:6379
       - RABBITMQ_URL=amqp://rabbitmq:5672
-    env_file:
-      - .env
     depends_on:
       redis:
         condition: service_healthy

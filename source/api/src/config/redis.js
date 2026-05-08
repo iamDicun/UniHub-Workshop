@@ -10,9 +10,20 @@ const client = createClient({
 client.on('error', (err) => console.log('Redis Client Error', err));
 client.on('connect', () => console.log('Redis connected'));
 
-export const connectRedis = async () => {
-  if (!client.isOpen) {
-    await client.connect();
+export const connectRedis = async (retryCount = 5) => {
+  try {
+    if (!client.isOpen) {
+      await client.connect();
+    }
+  } catch (err) {
+    console.error(`Redis Connection Failed. Retries left: ${retryCount}`, err.message);
+    if (retryCount > 0) {
+      console.log('Retrying Redis in 5 seconds...');
+      await new Promise(resolve => setTimeout(resolve, 5000));
+      return connectRedis(retryCount - 1);
+    } else {
+      console.error('Redis Connection failed after maximum retries');
+    }
   }
 };
 

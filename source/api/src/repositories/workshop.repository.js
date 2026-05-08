@@ -41,10 +41,13 @@ export const listWorkshopsForUser = async (userId) => {
     `SELECT
       ${workshopSelect},
       r.id AS registration_id,
-      r.status AS registration_status
+      r.status AS registration_status,
+      c.id IS NOT NULL AS is_checked_in
      FROM workshops w
      LEFT JOIN registrations r
        ON r.workshop_id = w.id AND r.student_id = $1
+     LEFT JOIN checkins c
+       ON c.registration_id = r.id
      ORDER BY w.start_time ASC`,
     [userId]
   );
@@ -56,10 +59,13 @@ export const getWorkshopByIdForUser = async (workshopId, userId) => {
     `SELECT
       ${workshopSelect},
       r.id AS registration_id,
-      r.status AS registration_status
+      r.status AS registration_status,
+      c.id IS NOT NULL AS is_checked_in
      FROM workshops w
      LEFT JOIN registrations r
        ON r.workshop_id = w.id AND r.student_id = $2
+     LEFT JOIN checkins c
+       ON c.registration_id = r.id
      WHERE w.id = $1`,
     [workshopId, userId]
   );

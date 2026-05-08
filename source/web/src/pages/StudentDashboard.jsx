@@ -251,9 +251,16 @@ const StudentDashboard = () => {
 
               <div className="flex flex-wrap items-center gap-2">
                 {isRegistered ? (
-                  <span className="rounded-full bg-brand-500/10 px-3 py-1 text-xs font-semibold text-brand-700">
-                    Đã đăng ký
-                  </span>
+                  workshop.is_checked_in ? (
+                    <span className="rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-semibold text-emerald-700 flex items-center gap-1">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                      Đã Check-in
+                    </span>
+                  ) : (
+                    <span className="rounded-full bg-brand-500/10 px-3 py-1 text-xs font-semibold text-brand-700">
+                      Đã đăng ký
+                    </span>
+                  )
                 ) : (
                   <span className="rounded-full bg-brand-100 px-3 py-1 text-xs font-semibold text-brand-700">
                     {isFull ? 'Hết chỗ' : 'Còn chỗ'}
@@ -333,20 +340,30 @@ const StudentDashboard = () => {
             </section>
 
             {selectedWorkshop.registration_status === 'confirmed' ? (
-              <div className="rounded-2xl border border-brand-200/70 bg-brand-50 px-4 py-3 text-xs text-brand-900">
-                <div className="flex items-center justify-between mb-4">
-                  <span className="font-semibold">Đã đăng ký</span>
-                  <span className="rounded-full bg-white px-2 py-0.5 text-[10px] uppercase tracking-wide text-brand-500">
-                    Mã QR Check-in
-                  </span>
+              selectedWorkshop.is_checked_in ? (
+                <div className="rounded-2xl border border-emerald-200/70 bg-emerald-50 px-4 py-4 text-sm text-emerald-900 flex flex-col items-center justify-center">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-emerald-100 mb-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="text-emerald-600"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  </div>
+                  <span className="font-bold text-lg">Đã Check-in Thành Công</span>
+                  <p className="mt-1 text-emerald-700/80 text-center">Chúc bạn có một buổi workshop thú vị và bổ ích!</p>
                 </div>
-                <div className="flex justify-center bg-white p-4 rounded-xl border border-brand-200">
-                  <QRCodeCanvas value={selectedWorkshop.registration_id} size={200} />
+              ) : (
+                <div className="rounded-2xl border border-brand-200/70 bg-brand-50 px-4 py-3 text-xs text-brand-900">
+                  <div className="flex items-center justify-between mb-4">
+                    <span className="font-semibold">Đã đăng ký</span>
+                    <span className="rounded-full bg-white px-2 py-0.5 text-[10px] uppercase tracking-wide text-brand-500">
+                      Mã QR Check-in
+                    </span>
+                  </div>
+                  <div className="flex justify-center bg-white p-4 rounded-xl border border-brand-200">
+                    <QRCodeCanvas value={selectedWorkshop.registration_id} size={200} />
+                  </div>
+                  <p className="mt-4 text-center break-all font-mono text-[11px] text-brand-700">
+                    {selectedWorkshop.registration_id}
+                  </p>
                 </div>
-                <p className="mt-4 text-center break-all font-mono text-[11px] text-brand-700">
-                  {selectedWorkshop.registration_id}
-                </p>
-              </div>
+              )
             ) : null}
 
             {selectedWorkshop.registration_status === 'pending' ? (

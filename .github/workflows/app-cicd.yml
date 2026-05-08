@@ -9,6 +9,8 @@ on:
 jobs:
   build-apk:
     runs-on: ubuntu-latest
+    env:
+      EXPO_PUBLIC_API_URL: http://192.168.1.7/api
     defaults:
       run:
         working-directory: ./source/app

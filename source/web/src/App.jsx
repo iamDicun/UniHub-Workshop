@@ -8,6 +8,7 @@ import AdminPayments from './pages/AdminPayments';
 import StudentPayments from './pages/StudentPayments';
 import StaffDashboard from './pages/StaffDashboard';
 import Profile from './pages/Profile';
+import QrGenerator from './pages/QrGenerator';
 import { getHomeForRole, getStoredUser } from './utils/auth';
 
 const RoleRoute = ({ roles, children }) => {
@@ -90,6 +91,7 @@ function App() {
             </RoleRoute>
           }
         />
+        <Route path="/qr-gen" element={<QrGenerator />} />
         <Route path="/" element={<HomeRedirect />} />
         <Route path="*" element={<HomeRedirect />} />
       </Routes>

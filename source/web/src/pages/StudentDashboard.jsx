@@ -357,7 +357,7 @@ const StudentDashboard = () => {
                     </span>
                   </div>
                   <div className="flex justify-center bg-white p-4 rounded-xl border border-brand-200">
-                    <QRCodeCanvas value={selectedWorkshop.registration_id} size={200} />
+                    <QRCodeCanvas value={`${selectedWorkshop.id}|${selectedWorkshop.registration_id}`} size={200} />
                   </div>
                   <p className="mt-4 text-center break-all font-mono text-[11px] text-brand-700">
                     {selectedWorkshop.registration_id}

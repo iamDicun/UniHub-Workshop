@@ -50,21 +50,6 @@ export default function ProfileScreen() {
         </View>
       </View>
 
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Tài khoản</Text>
-        
-        <TouchableOpacity style={styles.menuItem}>
-          <View style={styles.menuIcon}><Ionicons name="settings-outline" size={20} color="#94a3b8" /></View>
-          <Text style={styles.menuText}>Cài đặt ứng dụng</Text>
-          <Ionicons name="chevron-forward" size={20} color="#475569" />
-        </TouchableOpacity>
-        
-        <TouchableOpacity style={styles.menuItem}>
-          <View style={styles.menuIcon}><Ionicons name="help-circle-outline" size={20} color="#94a3b8" /></View>
-          <Text style={styles.menuText}>Hỗ trợ & Trợ giúp</Text>
-          <Ionicons name="chevron-forward" size={20} color="#475569" />
-        </TouchableOpacity>
-      </View>
 
       <TouchableOpacity style={styles.logoutBtn} onPress={handleLogout}>
         <Ionicons name="log-out-outline" size={20} color="#ef4444" />

@@ -12,6 +12,7 @@ import {
   addWorkshopStaff,
   removeWorkshopStaff,
 } from '../api/client';
+import { uploadWithPresigned } from '../utils/upload';
 
 const formatDateTime = (value) => {
   if (!value) {
@@ -251,23 +252,40 @@ const AdminWorkshops = () => {
     }));
   };
 
-  const handlePdfUpload = (event) => {
+  const handlePdfUpload = async (event) => {
     const file = event.target.files[0];
     if (!file) return;
 
-    const loadingMessage = '<p><em>Đang phân tích PDF và tạo tóm tắt AI...</em></p>';
+    const loadingMessage = '<p><em>Đang tải PDF lên và phân tích AI...</em></p>';
     setForm((prev) => ({ ...prev, description: (prev.description || '') + loadingMessage }));
 
-    setTimeout(() => {
+    try {
+      const { cdnUrl, cdnProcessed } = await uploadWithPresigned(file, (pct) => {
+        const progressMsg = `<p><em>Đang tải PDF lên (${pct}%)...</em></p>`;
+        setForm((prev) => {
+          const cleaned = prev.description.replace(/<p><em>.*PDF.*<\/em><\/p>/g, '');
+          return { ...prev, description: cleaned + progressMsg };
+        });
+      });
+
       setForm((prev) => {
-        const cleaned = prev.description.replace(loadingMessage, '');
+        const cleaned = prev.description.replace(/<p><em>.*PDF.*<\/em><\/p>/g, '');
+        const fileLink = `<p><a href="${cdnUrl}" target="_blank" rel="noreferrer">📄 Xem PDF gốc</a></p>`;
         const summary = `<p><strong>Tóm tắt AI (${file.name}):</strong> Dựa trên nội dung tài liệu, workshop này sẽ cung cấp kiến thức nền tảng và kỹ năng thực chiến cho sinh viên. Bao gồm các bài tập thực hành trực tiếp và thảo luận nhóm.</p>`;
         return {
           ...prev,
-          description: cleaned + summary,
+          description: cleaned + fileLink + summary,
         };
       });
-    }, 2000);
+    } catch (err) {
+      setForm((prev) => {
+        const cleaned = prev.description.replace(/<p><em>.*PDF.*<\/em><\/p>/g, '');
+        return {
+          ...prev,
+          description: cleaned + `<p><em style="color:red;">Lỗi upload PDF: ${err.message}</em></p>`,
+        };
+      });
+    }
   };
 
   const handleSubmit = async (event) => {
@@ -515,11 +533,20 @@ const AdminWorkshops = () => {
                 Sơ đồ phòng (URL)
               </label>
               <label className="cursor-pointer rounded-full bg-brand-100 px-3 py-1 text-xs font-semibold text-brand-700 transition hover:bg-brand-200">
-                Tải ảnh lên (Storage Mock)
-                <input type="file" accept="image/*" className="hidden" onChange={(e) => {
+                Tải ảnh lên (S3)
+                <input type="file" accept="image/*" className="hidden" onChange={async (e) => {
                   const file = e.target.files[0];
-                  if (file) {
-                    setForm(prev => ({ ...prev, room_map_url: URL.createObjectURL(file) }));
+                  if (!file) return;
+                  console.log('[RoomMap] File selected:', file.name, file.type, file.size);
+                  try {
+                    const { cdnProcessed } = await uploadWithPresigned(file);
+                    const displayUrl = cdnProcessed ? cdnProcessed.large : '';
+                    console.log('[RoomMap] Upload done, URL:', displayUrl);
+                    setForm(prev => ({ ...prev, room_map_url: displayUrl }));
+                    alert('Upload thành công!');
+                  } catch (err) {
+                    console.error('[RoomMap] Upload error:', err);
+                    alert('Lỗi upload ảnh: ' + err.message);
                   }
                 }} />
               </label>

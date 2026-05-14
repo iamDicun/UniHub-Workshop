@@ -120,4 +120,18 @@ export const fetchAdminPayments = async () => {
   return response.data;
 };
 
+export const getPresignedUrl = async (filename, mimeType, size) => {
+  const response = await apiClient.post('/uploads/presigned', {
+    filename,
+    mimeType,
+    size,
+  });
+  return response.data.data;
+};
+
+export const confirmUpload = async (fileId) => {
+  const response = await apiClient.put(`/uploads/${fileId}/confirm`);
+  return response.data.data;
+};
+
 export default apiClient;

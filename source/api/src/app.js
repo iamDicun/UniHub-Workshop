@@ -8,6 +8,7 @@ import registrationRoutes from './routes/registration.routes.js';
 import checkinRoutes from './routes/checkin.routes.js';
 import jobRoutes from './routes/job.routes.js';
 import paymentRoutes from './routes/payment.routes.js';
+import uploadRoutes from './routes/upload.routes.js';
 
 const app = express();
 
@@ -15,8 +16,8 @@ app.use(helmet());
 app.use(cors());
 app.use(express.json());
 
-app.get("/", (req, res) => {
-  res.send("Server is running 🚀");
+app.get('/', (req, res) => {
+  res.send('Server is running 🚀');
 });
 
 // Thêm Logger để in ra Terminal mỗi khi có Request tới
@@ -34,6 +35,7 @@ app.use('/api/registrations', registrationRoutes);
 app.use('/api/checkins', checkinRoutes);
 app.use('/api', jobRoutes);
 app.use('/api/payments', paymentRoutes);
+app.use('/api/uploads', uploadRoutes);
 
 app.use((err, req, res, next) => {
   console.error(err.stack);

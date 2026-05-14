@@ -1,0 +1,10 @@
+name = "unihub-cdn-worker"
+main = "src/index.js"
+compatibility_date = "2024-01-01"
+
+[vars]
+S3_BUCKET = "project-unihub-bucket"
+AWS_REGION = "ap-southeast-1"
+
+# Routes: domain mà worker sẽ xử lý (sau khi add custom domain)
+# Sau deploy, vào Dashboard > Worker > Triggers > Custom Domains để gán cdn.unihub.example

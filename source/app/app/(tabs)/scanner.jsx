@@ -67,6 +67,28 @@ export default function ScannerScreen() {
       return;
     }
 
+    // === XỬ LÝ FORMAT QR MỚI (workshop_id|registration_id) ===
+    let registrationId = data;
+    let qrWorkshopId = null;
+
+    if (data.includes('|')) {
+      const parts = data.split('|');
+      qrWorkshopId = parts[0];
+      registrationId = parts[1];
+    } else {
+      // Chặn ngay mã QR cũ không có workshop_id
+      setResultMessage({ type: 'error', text: 'Mã QR cũ hoặc không hợp lệ. Vui lòng lấy mã QR mới trên Web.' });
+      setIsProcessing(false);
+      return;
+    }
+
+    // Xác thực Workshop (chặn ngay lập tức cả khi offline)
+    if (qrWorkshopId !== workshop.id) {
+      setResultMessage({ type: 'error', text: 'Mã QR này thuộc về một Workshop khác' });
+      setIsProcessing(false);
+      return;
+    }
+
     try {
       // 1. Kiểm tra trạng thái mạng
       const networkState = await Network.getNetworkStateAsync();
@@ -75,7 +97,7 @@ export default function ScannerScreen() {
       if (isOnline) {
         // 2a. Có mạng: Gọi API Check-in trực tiếp
         try {
-          await checkInStudent(workshop.id, data);
+          await checkInStudent(workshop.id, registrationId);
           setResultMessage({ type: 'success', text: 'Check-in trực tuyến thành công!' });
         } catch (apiError) {
           // Lỗi từ backend (QR sai, đã checkin, hoặc backend sập)
@@ -85,7 +107,7 @@ export default function ScannerScreen() {
       } else {
         // 2b. Mất mạng: Lưu offline
         const timestamp = new Date().toISOString();
-        const success = await addOfflineCheckin(workshop.id, data, timestamp);
+        const success = await addOfflineCheckin(workshop.id, registrationId, timestamp);
         if (success) {
           setResultMessage({
             type: 'offline',

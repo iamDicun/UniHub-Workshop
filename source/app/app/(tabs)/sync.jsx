@@ -22,6 +22,10 @@ export default function SyncScreen() {
   useFocusEffect(
     useCallback(() => {
       loadQueue();
+
+      // Auto-refresh mỗi 5 giây khi đang ở tab này
+      const interval = setInterval(loadQueue, 5000);
+      return () => clearInterval(interval);
     }, [])
   );
 
@@ -90,6 +94,14 @@ export default function SyncScreen() {
         </View>
       </View>
 
+      {/* Thông báo tự động đồng bộ */}
+      <View style={styles.autoSyncBanner}>
+        <Ionicons name="flash" size={16} color="#6366f1" />
+        <Text style={styles.autoSyncText}>
+          Dữ liệu sẽ tự động đồng bộ khi có mạng trở lại
+        </Text>
+      </View>
+
       <TouchableOpacity 
         style={[
           styles.syncBtn, 
@@ -103,7 +115,7 @@ export default function SyncScreen() {
         ) : (
           <>
             <Ionicons name="cloud-upload" size={20} color="#fff" />
-            <Text style={styles.syncBtnText}>Bắt đầu Đồng bộ</Text>
+            <Text style={styles.syncBtnText}>Đồng bộ thủ công</Text>
           </>
         )}
       </TouchableOpacity>
@@ -126,11 +138,13 @@ export default function SyncScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#0f172a', padding: 16 },
-  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20, marginTop: 10 },
+  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12, marginTop: 10 },
   title: { fontSize: 24, fontWeight: '700', color: '#f1f5f9' },
   subtitle: { fontSize: 14, color: '#94a3b8', marginTop: 4 },
   networkBadge: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#1e293b', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 20 },
   networkText: { fontSize: 12, fontWeight: '600', marginLeft: 6 },
+  autoSyncBanner: { flexDirection: 'row', alignItems: 'center', backgroundColor: 'rgba(99, 102, 241, 0.1)', paddingHorizontal: 14, paddingVertical: 10, borderRadius: 10, marginBottom: 16, borderWidth: 1, borderColor: 'rgba(99, 102, 241, 0.2)' },
+  autoSyncText: { color: '#a5b4fc', fontSize: 13, marginLeft: 8, flex: 1 },
   syncBtn: { backgroundColor: '#6366f1', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', paddingVertical: 14, borderRadius: 12, marginBottom: 24 },
   syncBtnDisabled: { backgroundColor: '#334155' },
   syncBtnText: { color: '#fff', fontSize: 16, fontWeight: '600', marginLeft: 8 },

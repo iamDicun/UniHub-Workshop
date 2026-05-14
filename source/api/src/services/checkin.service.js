@@ -25,7 +25,7 @@ const parseOfflineTime = (value) => {
   return parsed.toISOString();
 };
 
-export const checkInRegistration = async (registrationId, offlineScannedAt, staffUser) => {
+export const checkInRegistration = async (workshopId, registrationId, offlineScannedAt, staffUser) => {
   const client = await pool.connect();
   try {
     await client.query('BEGIN');
@@ -33,6 +33,10 @@ export const checkInRegistration = async (registrationId, offlineScannedAt, staf
     const registration = await getRegistrationById(registrationId, client);
     if (!registration) {
       throw buildError('Dang ky khong ton tai', 404);
+    }
+
+    if (registration.workshop_id !== workshopId) {
+      throw buildError('Ma QR nay thuoc ve mot Workshop khac', 400);
     }
 
     if (registration.status !== 'confirmed') {

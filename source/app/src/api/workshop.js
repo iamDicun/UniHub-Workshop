@@ -15,6 +15,7 @@ export const getAssignedWorkshops = async () => {
 export const checkInStudent = async (workshopId, qrData) => {
   try {
     const response = await apiClient.post('/checkins', {
+      workshop_id: workshopId,
       registration_id: qrData,
     });
     return response.data;
@@ -31,6 +32,7 @@ export const syncOfflineCheckins = async (offlineQueue) => {
   for (const checkin of offlineQueue) {
     try {
       await apiClient.post('/checkins', {
+        workshop_id: checkin.workshopId,
         registration_id: checkin.qrData,
         offline_scanned_at: checkin.timestamp,
       });

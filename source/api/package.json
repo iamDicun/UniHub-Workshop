@@ -23,9 +23,11 @@
     "express": "^4.19.2",
     "helmet": "^7.1.0",
     "jsonwebtoken": "^9.0.3",
+    "node-cron": "^4.2.1",
     "nodemailer": "^8.0.7",
     "opossum": "^9.0.0",
     "pg": "^8.11.5",
+    "pg-copy-streams": "^7.0.0",
     "redis": "^4.6.13",
     "uuid": "^14.0.0"
   },

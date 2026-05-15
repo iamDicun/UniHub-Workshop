@@ -15,7 +15,8 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-quill": "^2.0.0",
-    "react-router-dom": "^7.14.2"
+    "react-router-dom": "^7.14.2",
+    "unihub-api": "file:../api"
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.2.4",

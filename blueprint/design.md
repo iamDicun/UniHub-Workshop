@@ -140,6 +140,19 @@ Hệ thống sử dụng mô hình **RBAC (Role-Based Access Control)** với JW
 
 ---
 
+## Luồng nghiệp vụ quan trọng
+
+### 1. Đồng bộ CSV ban đêm (CSV Sync)
+- **Vấn đề:** Export file CSV từ hệ thống cũ không có API, dung lượng lớn, có thể gây tràn RAM và làm chết server chạy API nếu import trực tiếp bằng code tuần tự.
+- **Quy trình giải quyết:**
+  - **Upload:** File được upload lên AWS S3 và lấy `fileKey` trả về.
+  - **Trigger:** Frontend gọi API `/sync` kèm `fileKey`. Backend ghi nhận Job vào bảng `sync_jobs` (Pending).
+  - **Queue/Cron:** Sử dụng **RabbitMQ** hoặc **Cron Job** nạp event xử lý vào background worker dựa trên thiết lập môi trường (`SYNC_CRON_SCHEDULE`).
+  - **Streaming:** Để bảo vệ RAM, giải pháp không phân tích CSV trên Node.js mà **Stream luồng byte trực tiếp** từ S3 (`GetObjectCommand` body stream) nối (pipe) thẳng vào PostgreSQL thông qua `pg-copy-streams` (`COPY staging_users FROM STDIN`).
+  - **Merge:** Sau khi đổ vào bảng `staging_users`, sử dụng SQL hiệu suất cao (`INSERT ... SELECT ... ON CONFLICT DO UPDATE`) để merge dữ liệu qua bảng `users` chính. Chấm dứt tiến trình mà không gây gián đoạn hệ thống.
+
+---
+
 ## Các quyết định kỹ thuật quan trọng (ADR)
 
 1. **SQL (PostgreSQL) vs NoSQL (MongoDB):**

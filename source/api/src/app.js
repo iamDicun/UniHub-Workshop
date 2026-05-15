@@ -9,6 +9,7 @@ import checkinRoutes from './routes/checkin.routes.js';
 import jobRoutes from './routes/job.routes.js';
 import paymentRoutes from './routes/payment.routes.js';
 import uploadRoutes from './routes/upload.routes.js';
+import userRoutes from './routes/user.routes.js';
 
 const app = express();
 
@@ -36,6 +37,7 @@ app.use('/api/checkins', checkinRoutes);
 app.use('/api', jobRoutes);
 app.use('/api/payments', paymentRoutes);
 app.use('/api/uploads', uploadRoutes);
+app.use('/api/users', userRoutes);
 
 app.use((err, req, res, next) => {
   console.error(err.stack);

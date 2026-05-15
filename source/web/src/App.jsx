@@ -5,6 +5,7 @@ import StudentDashboard from './pages/StudentDashboard';
 import AdminWorkshops from './pages/AdminWorkshops';
 import AdminFailedJobs from './pages/AdminFailedJobs';
 import AdminPayments from './pages/AdminPayments';
+import AdminSyncUsers from './pages/AdminSyncUsers';
 import StudentPayments from './pages/StudentPayments';
 import StaffDashboard from './pages/StaffDashboard';
 import Profile from './pages/Profile';
@@ -72,6 +73,14 @@ function App() {
           element={
             <RoleRoute roles={['admin']}>
               <AdminPayments />
+            </RoleRoute>
+          }
+        />
+        <Route
+          path="/admin/sync-users"
+          element={
+            <RoleRoute roles={['admin']}>
+              <AdminSyncUsers />
             </RoleRoute>
           }
         />

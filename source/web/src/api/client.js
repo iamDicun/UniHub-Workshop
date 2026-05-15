@@ -135,3 +135,16 @@ export const confirmUpload = async (fileId) => {
 };
 
 export default apiClient;
+
+// ============================
+// USERS SYNC API
+// ============================
+export const getSyncJobs = async () => {
+  const response = await apiClient.get('/users/sync');
+  return response.data;
+};
+
+export const triggerSyncUsers = async (fileKey, isImmediate) => {
+  const response = await apiClient.post('/users/sync', { fileKey, isImmediate });
+  return response.data;
+};

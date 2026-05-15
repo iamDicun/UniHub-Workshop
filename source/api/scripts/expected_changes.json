@@ -1,0 +1,534 @@
+{
+  "updated": [
+    {
+      "student_code": "SV402",
+      "newName": "Sinh Viên 402 (Updated)",
+      "email": "sv402@example.com",
+      "expected_password": "SV402#sv402"
+    },
+    {
+      "student_code": "SV407",
+      "newName": "Sinh Viên 407 (Updated)",
+      "email": "sv407@example.com",
+      "expected_password": "SV407#sv407"
+    },
+    {
+      "student_code": "SV412",
+      "newName": "Sinh Viên 412 (Updated)",
+      "email": "sv412@example.com",
+      "expected_password": "SV412#sv412"
+    },
+    {
+      "student_code": "SV417",
+      "newName": "Sinh Viên 417 (Updated)",
+      "email": "sv417@example.com",
+      "expected_password": "SV417#sv417"
+    },
+    {
+      "student_code": "SV418",
+      "newName": "Sinh Viên 418 (Updated)",
+      "email": "sv418@example.com",
+      "expected_password": "SV418#sv418"
+    },
+    {
+      "student_code": "SV422",
+      "newName": "Sinh Viên 422 (Updated)",
+      "email": "sv422@example.com",
+      "expected_password": "SV422#sv422"
+    },
+    {
+      "student_code": "SV424",
+      "newName": "Sinh Viên 424 (Updated)",
+      "email": "sv424@example.com",
+      "expected_password": "SV424#sv424"
+    },
+    {
+      "student_code": "SV426",
+      "newName": "Sinh Viên 426 (Updated)",
+      "email": "sv426@example.com",
+      "expected_password": "SV426#sv426"
+    },
+    {
+      "student_code": "SV427",
+      "newName": "Sinh Viên 427 (Updated)",
+      "email": "sv427@example.com",
+      "expected_password": "SV427#sv427"
+    },
+    {
+      "student_code": "SV430",
+      "newName": "Sinh Viên 430 (Updated)",
+      "email": "sv430@example.com",
+      "expected_password": "SV430#sv430"
+    },
+    {
+      "student_code": "SV433",
+      "newName": "Sinh Viên 433 (Updated)",
+      "email": "sv433@example.com",
+      "expected_password": "SV433#sv433"
+    },
+    {
+      "student_code": "SV434",
+      "newName": "Sinh Viên 434 (Updated)",
+      "email": "sv434@example.com",
+      "expected_password": "SV434#sv434"
+    },
+    {
+      "student_code": "SV435",
+      "newName": "Sinh Viên 435 (Updated)",
+      "email": "sv435@example.com",
+      "expected_password": "SV435#sv435"
+    },
+    {
+      "student_code": "SV439",
+      "newName": "Sinh Viên 439 (Updated)",
+      "email": "sv439@example.com",
+      "expected_password": "SV439#sv439"
+    },
+    {
+      "student_code": "SV440",
+      "newName": "Sinh Viên 440 (Updated)",
+      "email": "sv440@example.com",
+      "expected_password": "SV440#sv440"
+    },
+    {
+      "student_code": "SV441",
+      "newName": "Sinh Viên 441 (Updated)",
+      "email": "sv441@example.com",
+      "expected_password": "SV441#sv441"
+    },
+    {
+      "student_code": "SV446",
+      "newName": "Sinh Viên 446 (Updated)",
+      "email": "sv446@example.com",
+      "expected_password": "SV446#sv446"
+    },
+    {
+      "student_code": "SV451",
+      "newName": "Sinh Viên 451 (Updated)",
+      "email": "sv451@example.com",
+      "expected_password": "SV451#sv451"
+    },
+    {
+      "student_code": "SV452",
+      "newName": "Sinh Viên 452 (Updated)",
+      "email": "sv452@example.com",
+      "expected_password": "SV452#sv452"
+    },
+    {
+      "student_code": "SV453",
+      "newName": "Sinh Viên 453 (Updated)",
+      "email": "sv453@example.com",
+      "expected_password": "SV453#sv453"
+    },
+    {
+      "student_code": "SV456",
+      "newName": "Sinh Viên 456 (Updated)",
+      "email": "sv456@example.com",
+      "expected_password": "SV456#sv456"
+    },
+    {
+      "student_code": "SV458",
+      "newName": "Sinh Viên 458 (Updated)",
+      "email": "sv458@example.com",
+      "expected_password": "SV458#sv458"
+    },
+    {
+      "student_code": "SV460",
+      "newName": "Sinh Viên 460 (Updated)",
+      "email": "sv460@example.com",
+      "expected_password": "SV460#sv460"
+    },
+    {
+      "student_code": "SV462",
+      "newName": "Sinh Viên 462 (Updated)",
+      "email": "sv462@example.com",
+      "expected_password": "SV462#sv462"
+    },
+    {
+      "student_code": "SV464",
+      "newName": "Sinh Viên 464 (Updated)",
+      "email": "sv464@example.com",
+      "expected_password": "SV464#sv464"
+    },
+    {
+      "student_code": "SV465",
+      "newName": "Sinh Viên 465 (Updated)",
+      "email": "sv465@example.com",
+      "expected_password": "SV465#sv465"
+    },
+    {
+      "student_code": "SV467",
+      "newName": "Sinh Viên 467 (Updated)",
+      "email": "sv467@example.com",
+      "expected_password": "SV467#sv467"
+    },
+    {
+      "student_code": "SV473",
+      "newName": "Sinh Viên 473 (Updated)",
+      "email": "sv473@example.com",
+      "expected_password": "SV473#sv473"
+    },
+    {
+      "student_code": "SV476",
+      "newName": "Sinh Viên 476 (Updated)",
+      "email": "sv476@example.com",
+      "expected_password": "SV476#sv476"
+    },
+    {
+      "student_code": "SV479",
+      "newName": "Sinh Viên 479 (Updated)",
+      "email": "sv479@example.com",
+      "expected_password": "SV479#sv479"
+    },
+    {
+      "student_code": "SV482",
+      "newName": "Sinh Viên 482 (Updated)",
+      "email": "sv482@example.com",
+      "expected_password": "SV482#sv482"
+    },
+    {
+      "student_code": "SV483",
+      "newName": "Sinh Viên 483 (Updated)",
+      "email": "sv483@example.com",
+      "expected_password": "SV483#sv483"
+    },
+    {
+      "student_code": "SV486",
+      "newName": "Sinh Viên 486 (Updated)",
+      "email": "sv486@example.com",
+      "expected_password": "SV486#sv486"
+    },
+    {
+      "student_code": "SV487",
+      "newName": "Sinh Viên 487 (Updated)",
+      "email": "sv487@example.com",
+      "expected_password": "SV487#sv487"
+    },
+    {
+      "student_code": "SV489",
+      "newName": "Sinh Viên 489 (Updated)",
+      "email": "sv489@example.com",
+      "expected_password": "SV489#sv489"
+    },
+    {
+      "student_code": "SV490",
+      "newName": "Sinh Viên 490 (Updated)",
+      "email": "sv490@example.com",
+      "expected_password": "SV490#sv490"
+    },
+    {
+      "student_code": "SV491",
+      "newName": "Sinh Viên 491 (Updated)",
+      "email": "sv491@example.com",
+      "expected_password": "SV491#sv491"
+    },
+    {
+      "student_code": "SV493",
+      "newName": "Sinh Viên 493 (Updated)",
+      "email": "sv493@example.com",
+      "expected_password": "SV493#sv493"
+    }
+  ],
+  "inserted": [
+    {
+      "student_code": "SV1000",
+      "name": "Sinh Viên 1000",
+      "email": "new_1000@example.com",
+      "expected_password": "SV1000#new_1000"
+    },
+    {
+      "student_code": "SV1001",
+      "name": "Sinh Viên 1001",
+      "email": "new_1001@example.com",
+      "expected_password": "SV1001#new_1001"
+    },
+    {
+      "student_code": "SV1002",
+      "name": "Sinh Viên 1002",
+      "email": "new_1002@example.com",
+      "expected_password": "SV1002#new_1002"
+    },
+    {
+      "student_code": "SV1003",
+      "name": "Sinh Viên 1003",
+      "email": "new_1003@example.com",
+      "expected_password": "SV1003#new_1003"
+    },
+    {
+      "student_code": "SV1004",
+      "name": "Sinh Viên 1004",
+      "email": "new_1004@example.com",
+      "expected_password": "SV1004#new_1004"
+    },
+    {
+      "student_code": "SV1005",
+      "name": "Sinh Viên 1005",
+      "email": "new_1005@example.com",
+      "expected_password": "SV1005#new_1005"
+    },
+    {
+      "student_code": "SV1006",
+      "name": "Sinh Viên 1006",
+      "email": "new_1006@example.com",
+      "expected_password": "SV1006#new_1006"
+    },
+    {
+      "student_code": "SV1007",
+      "name": "Sinh Viên 1007",
+      "email": "new_1007@example.com",
+      "expected_password": "SV1007#new_1007"
+    },
+    {
+      "student_code": "SV1008",
+      "name": "Sinh Viên 1008",
+      "email": "new_1008@example.com",
+      "expected_password": "SV1008#new_1008"
+    },
+    {
+      "student_code": "SV1009",
+      "name": "Sinh Viên 1009",
+      "email": "new_1009@example.com",
+      "expected_password": "SV1009#new_1009"
+    },
+    {
+      "student_code": "SV1010",
+      "name": "Sinh Viên 1010",
+      "email": "new_1010@example.com",
+      "expected_password": "SV1010#new_1010"
+    },
+    {
+      "student_code": "SV1011",
+      "name": "Sinh Viên 1011",
+      "email": "new_1011@example.com",
+      "expected_password": "SV1011#new_1011"
+    },
+    {
+      "student_code": "SV1012",
+      "name": "Sinh Viên 1012",
+      "email": "new_1012@example.com",
+      "expected_password": "SV1012#new_1012"
+    },
+    {
+      "student_code": "SV1013",
+      "name": "Sinh Viên 1013",
+      "email": "new_1013@example.com",
+      "expected_password": "SV1013#new_1013"
+    },
+    {
+      "student_code": "SV1014",
+      "name": "Sinh Viên 1014",
+      "email": "new_1014@example.com",
+      "expected_password": "SV1014#new_1014"
+    },
+    {
+      "student_code": "SV1015",
+      "name": "Sinh Viên 1015",
+      "email": "new_1015@example.com",
+      "expected_password": "SV1015#new_1015"
+    },
+    {
+      "student_code": "SV1016",
+      "name": "Sinh Viên 1016",
+      "email": "new_1016@example.com",
+      "expected_password": "SV1016#new_1016"
+    },
+    {
+      "student_code": "SV1017",
+      "name": "Sinh Viên 1017",
+      "email": "new_1017@example.com",
+      "expected_password": "SV1017#new_1017"
+    },
+    {
+      "student_code": "SV1018",
+      "name": "Sinh Viên 1018",
+      "email": "new_1018@example.com",
+      "expected_password": "SV1018#new_1018"
+    },
+    {
+      "student_code": "SV1019",
+      "name": "Sinh Viên 1019",
+      "email": "new_1019@example.com",
+      "expected_password": "SV1019#new_1019"
+    },
+    {
+      "student_code": "SV1020",
+      "name": "Sinh Viên 1020",
+      "email": "new_1020@example.com",
+      "expected_password": "SV1020#new_1020"
+    },
+    {
+      "student_code": "SV1021",
+      "name": "Sinh Viên 1021",
+      "email": "new_1021@example.com",
+      "expected_password": "SV1021#new_1021"
+    },
+    {
+      "student_code": "SV1022",
+      "name": "Sinh Viên 1022",
+      "email": "new_1022@example.com",
+      "expected_password": "SV1022#new_1022"
+    },
+    {
+      "student_code": "SV1023",
+      "name": "Sinh Viên 1023",
+      "email": "new_1023@example.com",
+      "expected_password": "SV1023#new_1023"
+    },
+    {
+      "student_code": "SV1024",
+      "name": "Sinh Viên 1024",
+      "email": "new_1024@example.com",
+      "expected_password": "SV1024#new_1024"
+    },
+    {
+      "student_code": "SV1025",
+      "name": "Sinh Viên 1025",
+      "email": "new_1025@example.com",
+      "expected_password": "SV1025#new_1025"
+    },
+    {
+      "student_code": "SV1026",
+      "name": "Sinh Viên 1026",
+      "email": "new_1026@example.com",
+      "expected_password": "SV1026#new_1026"
+    },
+    {
+      "student_code": "SV1027",
+      "name": "Sinh Viên 1027",
+      "email": "new_1027@example.com",
+      "expected_password": "SV1027#new_1027"
+    },
+    {
+      "student_code": "SV1028",
+      "name": "Sinh Viên 1028",
+      "email": "new_1028@example.com",
+      "expected_password": "SV1028#new_1028"
+    },
+    {
+      "student_code": "SV1029",
+      "name": "Sinh Viên 1029",
+      "email": "new_1029@example.com",
+      "expected_password": "SV1029#new_1029"
+    },
+    {
+      "student_code": "SV1030",
+      "name": "Sinh Viên 1030",
+      "email": "new_1030@example.com",
+      "expected_password": "SV1030#new_1030"
+    },
+    {
+      "student_code": "SV1031",
+      "name": "Sinh Viên 1031",
+      "email": "new_1031@example.com",
+      "expected_password": "SV1031#new_1031"
+    },
+    {
+      "student_code": "SV1032",
+      "name": "Sinh Viên 1032",
+      "email": "new_1032@example.com",
+      "expected_password": "SV1032#new_1032"
+    },
+    {
+      "student_code": "SV1033",
+      "name": "Sinh Viên 1033",
+      "email": "new_1033@example.com",
+      "expected_password": "SV1033#new_1033"
+    },
+    {
+      "student_code": "SV1034",
+      "name": "Sinh Viên 1034",
+      "email": "new_1034@example.com",
+      "expected_password": "SV1034#new_1034"
+    },
+    {
+      "student_code": "SV1035",
+      "name": "Sinh Viên 1035",
+      "email": "new_1035@example.com",
+      "expected_password": "SV1035#new_1035"
+    },
+    {
+      "student_code": "SV1036",
+      "name": "Sinh Viên 1036",
+      "email": "new_1036@example.com",
+      "expected_password": "SV1036#new_1036"
+    },
+    {
+      "student_code": "SV1037",
+      "name": "Sinh Viên 1037",
+      "email": "new_1037@example.com",
+      "expected_password": "SV1037#new_1037"
+    },
+    {
+      "student_code": "SV1038",
+      "name": "Sinh Viên 1038",
+      "email": "new_1038@example.com",
+      "expected_password": "SV1038#new_1038"
+    },
+    {
+      "student_code": "SV1039",
+      "name": "Sinh Viên 1039",
+      "email": "new_1039@example.com",
+      "expected_password": "SV1039#new_1039"
+    },
+    {
+      "student_code": "SV1040",
+      "name": "Sinh Viên 1040",
+      "email": "new_1040@example.com",
+      "expected_password": "SV1040#new_1040"
+    },
+    {
+      "student_code": "SV1041",
+      "name": "Sinh Viên 1041",
+      "email": "new_1041@example.com",
+      "expected_password": "SV1041#new_1041"
+    },
+    {
+      "student_code": "SV1042",
+      "name": "Sinh Viên 1042",
+      "email": "new_1042@example.com",
+      "expected_password": "SV1042#new_1042"
+    },
+    {
+      "student_code": "SV1043",
+      "name": "Sinh Viên 1043",
+      "email": "new_1043@example.com",
+      "expected_password": "SV1043#new_1043"
+    },
+    {
+      "student_code": "SV1044",
+      "name": "Sinh Viên 1044",
+      "email": "new_1044@example.com",
+      "expected_password": "SV1044#new_1044"
+    },
+    {
+      "student_code": "SV1045",
+      "name": "Sinh Viên 1045",
+      "email": "new_1045@example.com",
+      "expected_password": "SV1045#new_1045"
+    },
+    {
+      "student_code": "SV1046",
+      "name": "Sinh Viên 1046",
+      "email": "new_1046@example.com",
+      "expected_password": "SV1046#new_1046"
+    },
+    {
+      "student_code": "SV1047",
+      "name": "Sinh Viên 1047",
+      "email": "new_1047@example.com",
+      "expected_password": "SV1047#new_1047"
+    },
+    {
+      "student_code": "SV1048",
+      "name": "Sinh Viên 1048",
+      "email": "new_1048@example.com",
+      "expected_password": "SV1048#new_1048"
+    },
+    {
+      "student_code": "SV1049",
+      "name": "Sinh Viên 1049",
+      "email": "new_1049@example.com",
+      "expected_password": "SV1049#new_1049"
+    }
+  ]
+}

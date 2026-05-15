@@ -44,8 +44,12 @@ const PageShell = ({ title, subtitle, actions, children }) => {
                 >
                   Giao dịch
                 </Link>
-                <Link
-                  to="/admin/failed-jobs"
+                <Link                  to="/admin/sync-users"
+                  className="rounded-full border border-brand-200 px-4 py-2 text-sm font-semibold text-brand-700 transition hover:border-brand-500 hover:text-brand-900"
+                >
+                  Đồng bộ sinh viên
+                </Link>
+                <Link                  to="/admin/failed-jobs"
                   className="rounded-full bg-red-100 px-4 py-2 text-sm font-semibold text-red-700 transition hover:bg-red-200"
                 >
                   DLQ (Email Lỗi)

@@ -1,6 +1,5 @@
-import { S3Client } from '@aws-sdk/client-s3';
+import { S3Client, GetObjectCommand, PutObjectCommand } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
-import { PutObjectCommand } from '@aws-sdk/client-s3';
 import { v4 as uuidv4 } from 'uuid';
 import path from 'path';
 
@@ -124,3 +123,13 @@ export const generatePresignedUrl = async (
     uuid,
   };
 };
+
+export const getS3ReadStream = async (objectKey) => {
+  const command = new GetObjectCommand({
+    Bucket: BUCKET,
+    Key: objectKey,
+  });
+  const response = await s3Client.send(command);
+  return response.Body;
+};
+

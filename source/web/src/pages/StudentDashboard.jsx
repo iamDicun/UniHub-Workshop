@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import PageShell from '../components/PageShell';
 import Modal from '../components/Modal';
 import { QRCodeCanvas } from 'qrcode.react';
-import { fetchWorkshops, registerWorkshop, cancelRegistration } from '../api/client';
+import { fetchWorkshops, registerWorkshop, cancelRegistration, fetchWorkshopImages } from '../api/client';
 
 const formatDateTime = (value) => {
   if (!value) {
@@ -49,6 +49,7 @@ const StudentDashboard = () => {
   const [activeFilter, setActiveFilter] = useState('all');
   const [detailOpen, setDetailOpen] = useState(false);
   const [selectedWorkshop, setSelectedWorkshop] = useState(null);
+  const [workshopImages, setWorkshopImages] = useState([]);
 
   const loadWorkshops = async () => {
     setLoading(true);
@@ -104,14 +105,21 @@ const StudentDashboard = () => {
     });
   }, [workshops, activeFilter]);
 
-  const openDetail = (workshop) => {
+  const openDetail = async (workshop) => {
     setSelectedWorkshop(workshop);
     setDetailOpen(true);
+    try {
+      const images = await fetchWorkshopImages(workshop.id);
+      setWorkshopImages(images || []);
+    } catch {
+      setWorkshopImages([]);
+    }
   };
 
   const closeDetail = () => {
     setDetailOpen(false);
     setSelectedWorkshop(null);
+    setWorkshopImages([]);
   };
 
   const handleRegister = async (workshopId) => {
@@ -221,8 +229,16 @@ const StudentDashboard = () => {
               key={workshop.id}
               type="button"
               onClick={() => openDetail(workshop)}
-              className="flex w-full flex-col gap-3 rounded-xl border border-border bg-surface p-5 text-left shadow-soft transition-colors hover:border-accent"
+              className="flex w-full flex-col rounded-xl border border-border bg-surface text-left shadow-soft transition-colors hover:border-accent overflow-hidden"
             >
+              {workshop.thumbnail ? (
+                <img
+                  src={workshop.thumbnail}
+                  alt={workshop.title}
+                  className="h-20 w-full object-cover shrink-0"
+                />
+              ) : null}
+              <div className="flex flex-col gap-3 p-5">
               <div className="flex items-start justify-between gap-4">
                 <div className="min-w-0 flex-1">
                   <h3 className="font-display text-base font-semibold text-primary text-fade">
@@ -266,6 +282,7 @@ const StudentDashboard = () => {
                 )}
                 <span className="text-xs text-text-secondary">Nhấn để xem chi tiết</span>
               </div>
+              </div>
             </button>
           );
         })}
@@ -285,6 +302,18 @@ const StudentDashboard = () => {
                 {error}
               </div>
             )}
+            {workshopImages.length > 0 ? (
+              <div className="grid grid-cols-3 gap-2">
+                {workshopImages.map((img, idx) => (
+                  <img
+                    key={img.id || idx}
+                    src={img.cdn_medium || img.cdn_url}
+                    alt={`Ảnh ${idx + 1}`}
+                    className="h-32 w-full rounded-lg border border-border object-cover"
+                  />
+                ))}
+              </div>
+            ) : null}
             <section className="grid gap-3 rounded-xl border border-border bg-surface p-5">
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div>

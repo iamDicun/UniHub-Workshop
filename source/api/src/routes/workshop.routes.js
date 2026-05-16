@@ -6,6 +6,7 @@ import {
   updateWorkshopHandler,
   deleteWorkshopHandler,
   getWorkshopRegistrationsHandler,
+  aiGenerateWorkshopHandler,
 } from '../controllers/workshop.controller.js';
 import {
   getWorkshopStaffHandler,
@@ -22,6 +23,7 @@ router.get('/', protect, getWorkshops);
 router.get('/:id', protect, getWorkshopById);
 router.get('/:id/registrations', protect, authorize('admin'), getWorkshopRegistrationsHandler);
 router.post('/', protect, authorize('admin'), createWorkshopHandler);
+router.post('/ai-generate', protect, authorize('admin'), aiGenerateWorkshopHandler);
 router.put('/:id', protect, authorize('admin'), updateWorkshopHandler);
 router.delete('/:id', protect, authorize('admin'), deleteWorkshopHandler);
 

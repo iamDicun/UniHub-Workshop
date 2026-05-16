@@ -22,7 +22,7 @@ jest.unstable_mockModule('../../src/queue/notification.producer.js', () => ({
 const pool = (await import('../../src/config/db.js')).default;
 const payos = (await import('../../src/config/payos.js')).default;
 const { publishRegistrationEvent } = await import('../../src/queue/notification.producer.js');
-const { processWebhook } = await import('../../src/services/payment.service.js');
+const { processWebhook, processWebhookTest } = await import('../../src/services/payment.service.js');
 
 describe('Payment Service - processWebhook', () => {
   let mockClient;
@@ -113,5 +113,20 @@ describe('Payment Service - processWebhook', () => {
       workshopId: 88,
       registrationId: 10
     });
+  });
+
+  it('Nên xử lý webhook test mà không cần verify PayOS', async () => {
+    mockClient.query.mockImplementation((queryStr) => {
+      if (queryStr === 'BEGIN') return Promise.resolve();
+      if (queryStr === 'COMMIT') return Promise.resolve();
+      if (queryStr.includes('SELECT * FROM payments WHERE order_code = $1 FOR UPDATE')) return Promise.resolve({ rows: [{ id: 1, status: 'pending', registration_id: 10 }] });
+      if (queryStr.includes('SELECT * FROM registrations WHERE id = $1 FOR UPDATE')) return Promise.resolve({ rows: [{ id: 10, status: 'pending', student_id: 99, workshop_id: 88 }] });
+      return Promise.resolve({ rows: [] });
+    });
+
+    const result = await processWebhookTest({ code: '00', orderCode: 123 });
+
+    expect(result).toEqual({ status: 'success' });
+    expect(payos.webhooks.verify).not.toHaveBeenCalled();
   });
 });

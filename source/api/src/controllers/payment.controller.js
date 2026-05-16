@@ -1,4 +1,4 @@
-import { processWebhook, listMyPayments, listAdminPayments, markPaymentAsFailed } from '../services/payment.service.js';
+import { processWebhook, processWebhookTest, listMyPayments, listAdminPayments, markPaymentAsFailed } from '../services/payment.service.js';
 
 export const handlePayOSWebhook = async (req, res) => {
   try {
@@ -19,6 +19,28 @@ export const handlePayOSWebhook = async (req, res) => {
     // họ sẽ gửi request test. Nếu SDK verify lỗi ở bước này, ta vẫn trả về 200 
     // để Dashboard chấp nhận URL. Các lỗi thực tế sẽ được log ở console.
     res.status(200).json({ success: false, message: error.message });
+  }
+};
+
+export const handlePayOSWebhookTest = async (req, res) => {
+  try {
+    if (process.env.NODE_ENV === 'production') {
+      return res.status(403).json({ success: false, message: 'Webhook test is disabled in production' });
+    }
+
+    if (!req.body || Object.keys(req.body).length === 0) {
+      return res.status(400).json({ success: false, message: 'Request body is required' });
+    }
+
+    const result = await processWebhookTest(req.body);
+    if (!result) {
+      return res.json({ success: true });
+    }
+
+    res.json({ success: true, message: result.status });
+  } catch (error) {
+    console.error('[PayOS Webhook Test] Error:', error);
+    res.status(400).json({ success: false, message: error.message });
   }
 };
 

@@ -11,6 +11,10 @@ import {
   fetchWorkshopStaff,
   addWorkshopStaff,
   removeWorkshopStaff,
+  aiGenerateWorkshop,
+  fetchWorkshopImages,
+  addWorkshopImage,
+  deleteWorkshopImage,
 } from '../api/client';
 import { uploadWithPresigned } from '../utils/upload';
 
@@ -101,6 +105,13 @@ const AdminWorkshops = () => {
     isConfirm: false,
   });
 
+  const [aiLoading, setAiLoading] = useState(false);
+  const aiFileRef = React.useRef(null);
+
+  const [workshopImages, setWorkshopImages] = useState([]);
+  const [imageUploading, setImageUploading] = useState(false);
+  const imageFileRef = React.useRef(null);
+
   const showAlert = (message, title = 'Thông báo') => {
     setAlertConfig({
       isOpen: true,
@@ -151,10 +162,11 @@ const AdminWorkshops = () => {
   const openCreateModal = () => {
     setEditingId(null);
     setForm(emptyForm);
+    setWorkshopImages([]);
     setFormOpen(true);
   };
 
-  const openEditModal = (workshop) => {
+  const openEditModal = async (workshop) => {
     setEditingId(workshop.id);
     setForm({
       title: workshop.title || '',
@@ -169,6 +181,14 @@ const AdminWorkshops = () => {
       staffEmails: workshop.staff_emails || '',
     });
     setFormOpen(true);
+
+    // Load existing images
+    try {
+      const images = await fetchWorkshopImages(workshop.id);
+      setWorkshopImages(images || []);
+    } catch {
+      setWorkshopImages([]);
+    }
   };
 
   const closeForm = () => {
@@ -252,40 +272,115 @@ const AdminWorkshops = () => {
     }));
   };
 
-  const handlePdfUpload = async (event) => {
+  const handleAIGenerate = async () => {
+    // Trigger hidden file input
+    aiFileRef.current?.click();
+  };
+
+  const handleAIFileSelected = async (event) => {
     const file = event.target.files[0];
     if (!file) return;
 
-    const loadingMessage = '<p><em>Đang tải PDF lên và phân tích AI...</em></p>';
-    setForm((prev) => ({ ...prev, description: (prev.description || '') + loadingMessage }));
+    setAiLoading(true);
+    setError('');
 
     try {
-      const { cdnUrl, cdnProcessed } = await uploadWithPresigned(file, (pct) => {
-        const progressMsg = `<p><em>Đang tải PDF lên (${pct}%)...</em></p>`;
-        setForm((prev) => {
-          const cleaned = prev.description.replace(/<p><em>.*PDF.*<\/em><\/p>/g, '');
-          return { ...prev, description: cleaned + progressMsg };
-        });
+      // Step 1: Upload PDF to S3
+      const { fileId } = await uploadWithPresigned(file, (pct) => {
+        // silently upload
       });
 
-      setForm((prev) => {
-        const cleaned = prev.description.replace(/<p><em>.*PDF.*<\/em><\/p>/g, '');
-        const fileLink = `<p><a href="${cdnUrl}" target="_blank" rel="noreferrer">📄 Xem PDF gốc</a></p>`;
-        const summary = `<p><strong>Tóm tắt AI (${file.name}):</strong> Dựa trên nội dung tài liệu, workshop này sẽ cung cấp kiến thức nền tảng và kỹ năng thực chiến cho sinh viên. Bao gồm các bài tập thực hành trực tiếp và thảo luận nhóm.</p>`;
-        return {
-          ...prev,
-          description: cleaned + fileLink + summary,
-        };
-      });
+      if (!fileId) {
+        throw new Error('Upload succeeded but no fileId returned.');
+      }
+
+      // Step 2: Call AI to generate workshop data
+      const aiData = await aiGenerateWorkshop(fileId);
+
+      // Step 3: Auto-fill the form
+      setForm((prev) => ({
+        ...prev,
+        title: aiData.title || prev.title,
+        description: aiData.description || prev.description,
+        capacity: aiData.capacity?.toString() || prev.capacity,
+        price: aiData.price?.toString() || prev.price,
+        start_time: aiData.start_time ? toDateTimeLocal(aiData.start_time) : prev.start_time,
+        end_time: aiData.end_time ? toDateTimeLocal(aiData.end_time) : prev.end_time,
+        location: aiData.location || prev.location,
+        speaker: aiData.speaker || prev.speaker,
+      }));
+
+      showAlert('AI đã tạo xong nội dung workshop! Vui lòng kiểm tra và chỉnh sửa các trường trước khi lưu.', 'Tạo nhanh thành công');
     } catch (err) {
-      setForm((prev) => {
-        const cleaned = prev.description.replace(/<p><em>.*PDF.*<\/em><\/p>/g, '');
-        return {
-          ...prev,
-          description: cleaned + `<p><em style="color:red;">Lỗi upload PDF: ${err.message}</em></p>`,
-        };
-      });
+      const msg = err.response?.data?.message || err.message || 'Lỗi không xác định.';
+      setError(msg);
+    } finally {
+      setAiLoading(false);
+      // Reset file input
+      if (aiFileRef.current) {
+        aiFileRef.current.value = '';
+      }
     }
+  };
+
+  const handleImageUpload = () => {
+    imageFileRef.current?.click();
+  };
+
+  const handleImageFileSelected = async (event) => {
+    const files = event.target.files;
+    if (!files || files.length === 0) return;
+
+    setImageUploading(true);
+    const uploaded = [];
+
+    try {
+      for (const file of files) {
+        if (workshopImages.length + uploaded.length >= 5) {
+          showAlert('Đã đạt giới hạn 5 ảnh.', 'Giới hạn');
+          break;
+        }
+        const { cdnUrl, cdnProcessed, objectKey } = await uploadWithPresigned(file);
+        uploaded.push({
+          object_key: objectKey,
+          cdn_url: cdnUrl,
+          cdn_thumb: cdnProcessed?.thumb || cdnUrl,
+          cdn_medium: cdnProcessed?.medium || cdnUrl,
+          cdn_large: cdnProcessed?.large || cdnUrl,
+        });
+      }
+
+      // If editing an existing workshop, save images via API immediately
+      if (editingId) {
+        for (const img of uploaded) {
+          await addWorkshopImage(editingId, img);
+        }
+        const images = await fetchWorkshopImages(editingId);
+        setWorkshopImages(images || []);
+      } else {
+        // For new workshops, store locally and save after workshop creation
+        setWorkshopImages((prev) => [...prev, ...uploaded]);
+      }
+    } catch (err) {
+      showAlert(err.message || 'Lỗi upload ảnh.', 'Lỗi');
+    } finally {
+      setImageUploading(false);
+      if (imageFileRef.current) {
+        imageFileRef.current.value = '';
+      }
+    }
+  };
+
+  const handleDeleteImage = async (imageId, idx) => {
+    if (editingId) {
+      try {
+        await deleteWorkshopImage(editingId, imageId);
+      } catch (err) {
+        showAlert(err.response?.data?.message || 'Lỗi xóa ảnh.', 'Lỗi');
+        return;
+      }
+    }
+    setWorkshopImages((prev) => prev.filter((_, i) => i !== idx));
   };
 
   const handleSubmit = async (event) => {
@@ -310,7 +405,14 @@ const AdminWorkshops = () => {
       if (editingId) {
         await updateWorkshop(editingId, payload);
       } else {
-        await createWorkshop(payload);
+        const result = await createWorkshop(payload);
+        const newId = result?.data?.id || result?.id;
+        // Save uploaded images for new workshop
+        if (newId && workshopImages.length > 0) {
+          for (const img of workshopImages) {
+            await addWorkshopImage(newId, img).catch(() => {});
+          }
+        }
       }
 
       await loadWorkshops();
@@ -379,8 +481,16 @@ const AdminWorkshops = () => {
         {sortedWorkshops.map((workshop) => (
           <article
             key={workshop.id}
-            className="rounded-xl border border-border bg-surface p-5 shadow-soft"
+            className="overflow-hidden rounded-xl border border-border bg-surface shadow-soft"
           >
+            {workshop.thumbnail ? (
+              <img
+                src={workshop.thumbnail}
+                alt={workshop.title}
+                className="h-20 w-full object-cover"
+              />
+            ) : null}
+            <div className="p-5">
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0 flex-1">
                 <h3 className="font-display text-base font-semibold text-primary text-fade">
@@ -426,6 +536,7 @@ const AdminWorkshops = () => {
                 Xóa
               </button>
             </div>
+            </div>
           </article>
         ))}
       </div>
@@ -436,7 +547,24 @@ const AdminWorkshops = () => {
         title={editingId ? 'Chỉnh sửa workshop' : 'Tạo workshop mới'}
         description="Mô tả hỗ trợ định dạng HTML và có thanh công cụ định dạng."
         size="xl"
+        headerActions={
+          <button
+            type="button"
+            onClick={handleAIGenerate}
+            disabled={aiLoading}
+            className="rounded-lg bg-accent px-3 py-1.5 text-xs font-medium text-primary transition-opacity hover:opacity-90 disabled:opacity-50"
+          >
+            {aiLoading ? 'Đang tạo...' : 'Tạo nhanh với AI'}
+          </button>
+        }
       >
+        <input
+          type="file"
+          accept="application/pdf"
+          ref={aiFileRef}
+          className="hidden"
+          onChange={handleAIFileSelected}
+        />
         <form onSubmit={handleSubmit} className="grid gap-5">
           <div className="flex flex-col gap-1.5">
             <label className="text-sm font-medium text-primary">
@@ -451,15 +579,9 @@ const AdminWorkshops = () => {
           </div>
 
           <div className="grid gap-2">
-            <div className="flex items-center justify-between">
-              <label className="text-sm font-medium text-primary">
-                Mô tả
-              </label>
-              <label className="cursor-pointer rounded-lg bg-hover px-3 py-1.5 text-xs font-medium text-text-secondary transition-colors hover:bg-border">
-                Upload PDF Tóm Tắt AI
-                <input type="file" accept="application/pdf" className="hidden" onChange={handlePdfUpload} />
-              </label>
-            </div>
+            <label className="text-sm font-medium text-primary">
+              Mô tả
+            </label>
             <HtmlEditor value={form.description} onChange={handleDescriptionChange} />
           </div>
 
@@ -571,6 +693,54 @@ const AdminWorkshops = () => {
               placeholder="Nhập link sơ đồ phòng hoặc bấm tải ảnh lên..."
               className="w-full rounded-lg border border-border bg-background px-4 py-2.5 text-sm text-primary outline-none focus:border-accent focus:ring-1 focus:ring-accent/10 transition-colors duration-150"
             />
+          </div>
+
+          <div className="grid gap-2">
+            <div className="flex items-center justify-between">
+              <label className="text-sm font-medium text-primary">
+                Hình ảnh workshop (tối đa 5)
+              </label>
+              <button
+                type="button"
+                onClick={handleImageUpload}
+                disabled={imageUploading || workshopImages.length >= 5}
+                className="rounded-lg bg-hover px-3 py-1.5 text-xs font-medium text-text-secondary transition-colors hover:bg-border disabled:opacity-50"
+              >
+                {imageUploading ? 'Đang tải...' : `Tải ảnh lên (${workshopImages.length}/5)`}
+              </button>
+            </div>
+            <input
+              type="file"
+              accept="image/*"
+              ref={imageFileRef}
+              className="hidden"
+              multiple
+              onChange={handleImageFileSelected}
+            />
+            {workshopImages.length > 0 ? (
+              <div className="grid grid-cols-3 gap-2">
+                {workshopImages.map((img, idx) => (
+                  <div key={img.id || idx} className="group relative rounded-lg border border-border overflow-hidden bg-background">
+                    <img
+                      src={img.cdn_thumb || img.cdn_url}
+                      alt={`Ảnh ${idx + 1}`}
+                      className="h-24 w-full object-cover"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => handleDeleteImage(img.id, idx)}
+                      className="absolute top-1 right-1 rounded-full bg-error/80 p-0.5 text-white opacity-0 transition-opacity group-hover:opacity-100"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                    </button>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-xs text-text-secondary py-2">
+                Chưa có ảnh nào. Bấm "Tải ảnh lên" để thêm.
+              </p>
+            )}
           </div>
 
           <div className="flex flex-col gap-1.5">

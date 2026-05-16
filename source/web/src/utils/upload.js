@@ -66,6 +66,6 @@ export const uploadWithPresigned = async (file, onProgress) => {
   }
 
   console.log('[Upload] Done!', { objectKey, cdnUrl });
-  return { objectKey, cdnUrl, cdnProcessed };
+  return { objectKey, cdnUrl, cdnProcessed, fileId };
 };
 

@@ -16,7 +16,8 @@ const workshopSelect = `
   w.room_map_url,
   w.created_by,
   w.created_at,
-  (SELECT string_agg(u.email, ', ') FROM users u JOIN workshop_staffs ws ON u.id = ws.staff_id WHERE ws.workshop_id = w.id) AS staff_emails
+  (SELECT string_agg(u.email, ', ') FROM users u JOIN workshop_staffs ws ON u.id = ws.staff_id WHERE ws.workshop_id = w.id) AS staff_emails,
+  (SELECT cdn_thumb FROM workshop_images WHERE workshop_id = w.id ORDER BY sort_order ASC, created_at ASC LIMIT 1) AS thumbnail
 `;
 
 const workshopReturnSelect = `
@@ -33,7 +34,8 @@ const workshopReturnSelect = `
   room_map_url,
   created_by,
   created_at,
-  (SELECT string_agg(u.email, ', ') FROM users u JOIN workshop_staffs ws ON u.id = ws.staff_id WHERE ws.workshop_id = workshops.id) AS staff_emails
+  (SELECT string_agg(u.email, ', ') FROM users u JOIN workshop_staffs ws ON u.id = ws.staff_id WHERE ws.workshop_id = workshops.id) AS staff_emails,
+  (SELECT cdn_thumb FROM workshop_images WHERE workshop_id = workshops.id ORDER BY sort_order ASC, created_at ASC LIMIT 1) AS thumbnail
 `;
 
 export const listWorkshopsForUser = async (userId) => {

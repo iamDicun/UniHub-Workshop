@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 
-const Modal = ({ isOpen, title, description, onClose, children, size = 'lg' }) => {
+const Modal = ({ isOpen, title, description, onClose, children, size = 'lg', headerActions }) => {
   useEffect(() => {
     if (!isOpen) {
       return undefined;
@@ -44,13 +44,16 @@ const Modal = ({ isOpen, title, description, onClose, children, size = 'lg' }) =
               <p className="mt-1 text-sm text-text-secondary">{description}</p>
             ) : null}
           </div>
-          <button
-            type="button"
-            onClick={onClose}
-            className="rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-text-secondary transition-colors hover:bg-hover hover:text-primary"
-          >
-            Đóng
-          </button>
+          <div className="flex items-center gap-2">
+            {headerActions}
+            <button
+              type="button"
+              onClick={onClose}
+              className="rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-text-secondary transition-colors hover:bg-hover hover:text-primary"
+            >
+              Đóng
+            </button>
+          </div>
         </div>
         <div className="mt-5 grid gap-5 overflow-y-auto px-6 pb-6">{children}</div>
       </div>

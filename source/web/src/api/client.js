@@ -148,3 +148,29 @@ export const triggerSyncUsers = async (fileKey, isImmediate) => {
   const response = await apiClient.post('/users/sync', { fileKey, isImmediate });
   return response.data;
 };
+
+// ============================
+// AI WORKSHOP GENERATION
+// ============================
+export const aiGenerateWorkshop = async (fileId) => {
+  const response = await apiClient.post('/workshops/ai-generate', { fileId });
+  return response.data.data;
+};
+
+// ============================
+// WORKSHOP IMAGES API
+// ============================
+export const fetchWorkshopImages = async (workshopId) => {
+  const response = await apiClient.get(`/workshops/${workshopId}/images`);
+  return response.data.data;
+};
+
+export const addWorkshopImage = async (workshopId, imageData) => {
+  const response = await apiClient.post(`/workshops/${workshopId}/images`, imageData);
+  return response.data.data;
+};
+
+export const deleteWorkshopImage = async (workshopId, imageId) => {
+  const response = await apiClient.delete(`/workshops/${workshopId}/images/${imageId}`);
+  return response.data;
+};

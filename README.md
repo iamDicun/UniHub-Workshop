@@ -14,6 +14,22 @@ cd source/
 docker-compose up --build
 ```
 
+### Chạy dev server cho API và Web
+
+Mở 2 terminal riêng:
+
+```bash
+cd source/api
+npm install
+npm run dev
+```
+
+```bash
+cd source/web
+npm install
+npm run dev
+```
+
 | Dịch vụ | URL |
 |---------|-----|
 | Web App (Student/Admin) | http://localhost |
@@ -25,26 +41,21 @@ docker-compose up --build
 
 ---
 
-## 🌱 Seed dữ liệu mẫu
+## 📱 Mobile App (file tải sẵn)
 
-Chạy sau khi `docker-compose up` thành công:
+Tải app qua Google Drive:
 
-```bash
-# Cách 1: Từ container (thay api1 bằng tên container thực tế)
-docker exec -it source-api1-1 node scripts/seed.js
+https://drive.google.com/file/d/1x2DcXRxL3Ge0O22MfJiXwPrtU0G9TPhM/view?usp=sharing
 
-# Cách 2: Chạy local (yêu cầu Node.js và .env đúng)
-cd source/api
-node --env-file=../.env scripts/seed.js
-```
+---
 
-### Tài khoản mẫu sau khi seed:
+### Tài khoản mẫu
 
 | Email | Mật khẩu | Vai trò |
 |-------|----------|---------|
-| admin@unihub.edu.vn | password123 | Admin |
-| student1@student.edu.vn | password123 | Sinh viên |
-| staff1@unihub.edu.vn | password123 | Nhân sự check-in |
+| admin@unihub.edu.vn | 123456 | Admin |
+| buicuong7954@gmail.com | 123456 | Sinh viên |
+| staff@unihub.edu.vn | 123456 | Nhân sự check-in |
 
 ---
 
@@ -82,6 +93,36 @@ docker-compose down
 # Xóa cả volumes (database local nếu có):
 docker-compose down -v
 ```
+
+---
+
+## 🧪 Test PayOS webhook bằng Postman
+
+Endpoint (dùng chung cho webhook thật và test):
+
+```
+POST http://localhost/api/payments/webhook
+```
+
+Header để bật test mode:
+
+```
+x-webhook-test: 1
+```
+
+Body mẫu:
+
+```json
+{
+	"testMode": true,
+	"code": "00",
+	"orderCode": 123
+}
+```
+
+Ghi chú:
+- `orderCode` phải trùng với một payment đã tồn tại trong database.
+- Bạn có thể lấy `orderCode` từ response đăng ký workshop hoặc từ trang Lịch sử thanh toán.
 
 ---
 

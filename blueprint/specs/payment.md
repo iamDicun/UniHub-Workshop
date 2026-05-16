@@ -33,3 +33,67 @@ Chức năng này quản lý quá trình thanh toán của sinh viên đối v�
 - Đăng ký miễn phí trả thẳng trạng thái `confirmed`.
 - Đăng ký có phí trả về link PayOS.
 - Giả lập tắt mạng PayOS: Sinh viên vẫn giữ được ghế trống và hệ thống hiển thị nút "Thanh toán lại" ở ngoài Dashboard để sinh viên có thể tự bấm lại khi cổng thanh toán sống lại.
+
+---
+
+## Sơ đồ luồng (Sequence Diagram)
+
+```mermaid
+sequenceDiagram
+    participant S as Sinh viên (Web)
+    participant API as Backend API
+    participant DB as PostgreSQL
+    participant CB as Circuit Breaker
+    participant PayOS as PayOS Gateway
+    participant MQ as RabbitMQ
+    participant W as Email Worker
+
+    S->>API: POST /api/workshops/:id/register (có phí)
+    API->>API: JWT Auth + Rate Limit check
+    
+    API->>DB: BEGIN TRANSACTION
+    API->>DB: SELECT available_seats FOR UPDATE
+    DB-->>API: seats > 0 (còn chỗ)
+    API->>DB: UPDATE available_seats -= 1
+    API->>DB: INSERT registration (status = 'pending')
+    API->>DB: INSERT payment (status = 'pending', idempotency_key)
+    API->>DB: COMMIT
+    
+    API->>CB: Gọi PayOS tạo checkoutUrl
+    
+    alt Circuit CLOSED (PayOS bình thường)
+        CB->>PayOS: POST /create-payment-link
+        PayOS-->>CB: { checkoutUrl, orderCode }
+        CB-->>API: checkoutUrl
+        API->>DB: UPDATE payment<br/>SET checkout_url, order_code
+        API->>MQ: Publish notification_queue
+        API-->>S: 201 { checkoutUrl }
+        S->>PayOS: Chuyển hướng thanh toán
+    else Circuit OPEN (PayOS lỗi > 50%)
+        CB-->>API: Fallback (không gọi PayOS)
+        Note over API: checkoutUrl = null<br/>Giữ nguyên registration + payment (pending)
+        API-->>S: 201 { checkoutUrl: null,<br/>message: "Giữ chỗ thành công,<br/>thanh toán sau" }
+    end
+    
+    Note over S,PayOS: === Webhook khi thanh toán thành công ===
+    PayOS-->>API: Webhook POST (orderCode, status = PAID)
+    API->>DB: UPDATE payment<br/>SET status = 'paid', external_id
+    API->>DB: UPDATE registration<br/>SET status = 'confirmed'
+    API->>MQ: Publish notification_queue
+    W->>MQ: Consume → gửi email xác nhận + QR
+```
+
+### Sơ đồ trạng thái Circuit Breaker
+
+```mermaid
+stateDiagram-v2
+    [*] --> CLOSED
+    CLOSED --> OPEN : Tỷ lệ lỗi > 50% trong 10s
+    OPEN --> HALF_OPEN : Sau 30s timeout
+    HALF_OPEN --> CLOSED : Request test thành công
+    HALF_OPEN --> OPEN : Request test thất bại
+
+    note right of CLOSED : Gọi PayOS bình thường
+    note right of OPEN : Fail Fast (không gọi mạng)
+    note right of HALF_OPEN : Thử 1 request test
+```

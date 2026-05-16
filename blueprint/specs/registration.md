@@ -30,3 +30,58 @@ Tính năng Đăng ký cho phép Sinh viên giành chỗ tham dự tại các Wo
 
 ## Tiêu chí chấp nhận
 - Chạy giả lập 1.000 user cùng chọc vào API mua vé Workshop chỉ có 50 ghế trống. Kết thúc bài test, Database phải hiển thị chính xác 50 vé được mua và `available_seats = 0`, không bao giờ được phép có số ghế bị âm hoặc có 51 người mua thành công.
+
+---
+
+## Sơ đồ luồng (Sequence Diagram)
+
+```mermaid
+sequenceDiagram
+    participant S as Sinh viên (Web)
+    participant API as Backend API
+    participant Redis as Redis
+    participant DB as PostgreSQL
+    participant MQ as RabbitMQ
+    participant W as Email Worker
+
+    S->>API: POST /api/workshops/:id/register
+    API->>API: JWT Auth (role = student)
+    
+    API->>Redis: Global Rate Limit Check
+    alt Vượt ngưỡng (429)
+        Redis-->>API: Rate limit exceeded
+        API-->>S: 429 Too Many Requests
+    end
+    
+    API->>Redis: User Sliding Window Check
+    alt Vượt ngưỡng (429)
+        Redis-->>API: Rate limit exceeded
+        API-->>S: 429 Too Many Requests
+    end
+    
+    API->>DB: BEGIN TRANSACTION
+    API->>DB: SELECT available_seats<br/>FROM workshops<br/>WHERE id = :id<br/>FOR UPDATE
+    DB-->>API: seats = N
+    
+    alt Hết chỗ (seats <= 0)
+        API->>DB: ROLLBACK
+        API-->>S: 409 Conflict "Hết chỗ"
+    end
+    
+    API->>DB: UPDATE workshops<br/>SET available_seats = available_seats - 1
+    API->>DB: INSERT INTO registrations<br/>(status = 'pending')
+    API->>DB: COMMIT
+    
+    API->>MQ: Publish notification_queue
+    API-->>S: 201 Created { registration }
+    
+    MQ->>W: Consume message
+    W->>W: Gửi email xác nhận + QR
+    W->>DB: INSERT notifications (status = 'sent')
+```
+
+**Xử lý lỗi trong luồng**:
+- **Rate Limit → 429**: "Hệ thống đang quá tải, vui lòng thử lại sau vài giây".
+- **Hết chỗ → 409**: "Rất tiếc, vé cuối cùng vừa có người đăng ký".
+- **DB lỗi → 500**: Rollback transaction, không mất dữ liệu.
+- **Email thất bại**: Worker retry qua DLX (max 3 lần), message không mất.

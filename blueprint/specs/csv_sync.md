@@ -38,6 +38,61 @@ Hệ thống cũ không cung cấp API mà chỉ hỗ trợ trích xuất dữ l
 - Nhấp nút "Sync Now" thì quá trình bắt đầu sau tối đa 2s, nếu không chọn, qua rạng sáng hệ thống cập nhật tự động.
 - Dữ liệu trùng sẽ được ghi đè thông tin mới từ file CSV, bản ghi mới được thêm và bản ghi cũ (không có trong CSV) vẫn giữ lại (giả dụ hệ thống có lưu account riêng).
 
+---
+
+## Sơ đồ luồng (Sequence Diagram)
+
+```mermaid
+sequenceDiagram
+    participant Admin as Ban tổ chức
+    participant API as Backend API
+    participant S3 as AWS S3
+    participant DB as PostgreSQL
+    participant MQ as RabbitMQ
+    participant W as CSV Sync Worker
+
+    Note over Admin,S3: === Pha 1: Upload CSV lên S3 (không qua API) ===
+    Admin->>API: POST /uploads/presigned-url
+    API->>S3: Generate Presigned URL (PUT, 5 phút)
+    S3-->>API: presignedUrl
+    API->>DB: INSERT files (status='uploaded')
+    API-->>Admin: { presignedUrl, fileKey }
+
+    Admin->>S3: PUT file CSV (upload trực tiếp)
+    S3-->>Admin: 200 OK
+    
+    Admin->>API: POST /uploads/confirm
+    API->>DB: UPDATE files SET status='done'
+
+    Note over Admin,DB: === Pha 2: Kích hoạt đồng bộ ===
+    Admin->>API: POST /users/sync { fileKey, isImmediate }
+    
+    alt isImmediate = true (đồng bộ ngay)
+        API->>DB: INSERT sync_jobs (status='Pending')
+        API->>MQ: Publish user_sync_queue { jobId, fileKey }
+        API-->>Admin: 200 "Đã gửi job đồng bộ"
+    else isImmediate = false (chờ cron đêm)
+        API->>DB: INSERT sync_jobs (status='Pending')
+        API-->>Admin: 200 "Job sẽ chạy vào 2h sáng"
+    end
+
+    Note over MQ,W: === Pha 3: Worker xử lý (Streaming) ===
+    W->>MQ: Consume message (prefetch=1)
+    W->>DB: UPDATE sync_jobs SET status='Processing'
+    
+    W->>DB: TRUNCATE staging_users
+    W->>S3: GetObject (Readable Stream)
+    S3-->>W: CSV Byte Stream
+    
+    Note over W,DB: Pipeline: S3 → Node Stream → pg-copy-streams<br/>RAM = O(1) — không load toàn bộ file
+    
+    W->>DB: COPY staging_users FROM STDIN (pipe stream)
+    W->>DB: UPSERT: INSERT INTO users<br/>SELECT ... FROM staging_users<br/>ON CONFLICT (student_code) DO UPDATE
+    
+    W->>DB: UPDATE sync_jobs SET status='Completed'
+    W->>MQ: ACK (xác nhận hoàn tất)
+```
+
 ## Phân tích Kiến trúc: Ưu nhược điểm và Khả năng chịu tải (Architecture Analysis)
 
 Dựa trên thực tế đã triển khai (S3 Presigned URL, RabbitMQ, pg-copy-streams, Staging Table, Code Base Python tạo Test Data), dưới đây là đánh giá kỹ thuật chi tiết:

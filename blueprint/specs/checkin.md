@@ -36,3 +36,63 @@ Chức năng cho phép nhân sự (staff) dùng Mobile App (React Native) quét 
 - Chuyển điện thoại về chế độ Máy bay (Airplane mode), Staff quét QR hợp lệ và nhận thông báo xanh lá.
 - Quét QR của Workshop B khi đang đứng ở màn hình Workshop A, App báo đỏ.
 - Bật lại Wifi, đợi 5-10 giây, danh sách Check-in lưu tạm trên App biến mất và dữ liệu đổ thẳng lên Database Postgres trên Server.
+
+---
+
+## Sơ đồ luồng (Sequence Diagram)
+
+### Giai đoạn Offline — Quét QR khi mất mạng
+
+```mermaid
+sequenceDiagram
+    participant Staff as Nhân sự (Mobile)
+    participant App as Mobile App (Expo)
+    participant AS as AsyncStorage (Local)
+
+    Staff->>App: Mở App, chọn Workshop A
+    App->>AS: Lưu selectedWorkshopId = 'W1'
+    
+    Staff->>App: Quét QR (W1|REG1)
+    App->>App: Parse QR → workshopId='W1', regId='REG1'
+    App->>App: Validate: W1 === W1 ✓ (khớp workshop)
+    App->>App: Lock camera (useRef) — chống spam scan
+    
+    App->>AS: Lưu checkin: { regId, workshopId, offlineScannedAt }
+    App-->>Staff: ✅ "Check-in tạm thời thành công"
+    
+    Staff->>App: Quét QR (W2|REG2) — Workshop B
+    App->>App: Validate: W2 !== W1 ✗ (khác workshop)
+    App-->>Staff: ❌ "Mã QR thuộc Workshop khác"
+```
+
+### Giai đoạn Online — Đồng bộ khi có mạng trở lại
+
+```mermaid
+sequenceDiagram
+    participant App as Mobile App (Expo)
+    participant AS as AsyncStorage (Local)
+    participant API as Backend API
+    participant DB as PostgreSQL
+
+    App->>App: useAutoSync detect network
+    App->>AS: Lấy tất cả pending checkins
+    
+    loop Mỗi checkin pending
+        App->>API: POST /api/checkins { registrationId, offlineScannedAt }
+        API->>API: JWT Auth (staff) + Validate workshop
+        
+        alt Registration hợp lệ, chưa check-in
+            API->>DB: INSERT checkins<br/>(offline_scanned_at từ mobile)
+            DB-->>API: 201 Created
+            API-->>App: 201
+            App->>AS: XÓA checkin khỏi pending list
+        else Đã check-in trước đó (trùng)
+            API->>DB: UNIQUE constraint trên registration_id → reject
+            API-->>App: 409 Conflict
+            App->>AS: XÓA checkin khỏi pending list (bỏ qua)
+        else API lỗi / mất mạng
+            API-->>App: Error
+            App->>AS: GIỮ NGUYÊN, thử lại sau 10s
+        end
+    end
+```

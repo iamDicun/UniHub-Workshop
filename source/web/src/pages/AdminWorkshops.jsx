@@ -96,6 +96,8 @@ const AdminWorkshops = () => {
   const [workshopStaff, setWorkshopStaff] = useState([]);
   const [staffLoading, setStaffLoading] = useState(false);
   const [newStaffEmail, setNewStaffEmail] = useState('');
+  const [detailImages, setDetailImages] = useState([]);
+  const [lightboxImage, setLightboxImage] = useState(null);
 
   const [alertConfig, setAlertConfig] = useState({
     isOpen: false,
@@ -249,6 +251,12 @@ const AdminWorkshops = () => {
     setDetailOpen(true);
     await loadRegistrations(workshop.id);
     await loadStaff(workshop.id);
+    try {
+      const images = await fetchWorkshopImages(workshop.id);
+      setDetailImages(images || []);
+    } catch {
+      setDetailImages([]);
+    }
   };
 
   const closeDetail = () => {
@@ -256,6 +264,7 @@ const AdminWorkshops = () => {
     setSelectedWorkshop(null);
     setRegistrations([]);
     setRegistrationsError('');
+    setDetailImages([]);
   };
 
   const handleChange = (field) => (event) => {
@@ -783,6 +792,27 @@ const AdminWorkshops = () => {
       >
         {selectedWorkshop ? (
           <div className="grid gap-6">
+            {detailImages.length > 0 ? (
+              <section className="grid gap-3">
+                <h3 className="font-display text-base font-semibold text-primary">Hình ảnh</h3>
+                <div className="grid grid-cols-2 gap-2">
+                  {detailImages.map((img, idx) => (
+                    <button
+                      key={img.id || idx}
+                      type="button"
+                      onClick={() => setLightboxImage(img.cdn_large || img.cdn_url)}
+                      className="overflow-hidden rounded-lg border border-border transition-opacity hover:opacity-90"
+                    >
+                      <img
+                        src={img.cdn_medium || img.cdn_url}
+                        alt={`Ảnh ${idx + 1}`}
+                        className="h-40 w-full object-cover"
+                      />
+                    </button>
+                  ))}
+                </div>
+              </section>
+            ) : null}
             <section className="grid gap-4 rounded-xl border border-border bg-surface p-5">
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div>
@@ -971,6 +1001,21 @@ const AdminWorkshops = () => {
           </div>
         </div>
       </Modal>
+
+      {lightboxImage ? (
+        <div
+          className="fixed inset-0 z-[60] flex items-center justify-center bg-primary/80 p-4"
+          onClick={() => setLightboxImage(null)}
+          role="button"
+          tabIndex={-1}
+        >
+          <img
+            src={lightboxImage}
+            alt="Ảnh phóng to"
+            className="max-h-[90vh] max-w-full rounded-xl object-contain"
+          />
+        </div>
+      ) : null}
     </PageShell>
   );
 };

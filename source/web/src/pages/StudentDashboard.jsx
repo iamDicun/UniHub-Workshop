@@ -45,11 +45,14 @@ const StudentDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [busyId, setBusyId] = useState(null);
+  const [paymentRedirect, setPaymentRedirect] = useState(null);
+  const [copyStatus, setCopyStatus] = useState('');
 
   const [activeFilter, setActiveFilter] = useState('all');
   const [detailOpen, setDetailOpen] = useState(false);
   const [selectedWorkshop, setSelectedWorkshop] = useState(null);
   const [workshopImages, setWorkshopImages] = useState([]);
+  const [lightboxImage, setLightboxImage] = useState(null);
 
   const loadWorkshops = async () => {
     setLoading(true);
@@ -122,6 +125,36 @@ const StudentDashboard = () => {
     setWorkshopImages([]);
   };
 
+  const closePaymentRedirect = () => {
+    setPaymentRedirect(null);
+    setCopyStatus('');
+  };
+
+  const handleCopyOrderCode = async () => {
+    if (!paymentRedirect?.orderCode) {
+      return;
+    }
+
+    try {
+      await navigator.clipboard.writeText(String(paymentRedirect.orderCode));
+      setCopyStatus('Đã copy mã đơn hàng');
+    } catch {
+      setCopyStatus('Không thể copy tự động, hãy copy thủ công');
+    }
+  };
+
+  const handleContinueToPayOS = () => {
+    if (!paymentRedirect?.checkoutUrl) {
+      return;
+    }
+
+    if (paymentRedirect.orderCode) {
+      localStorage.setItem('pendingOrderCode', paymentRedirect.orderCode);
+    }
+
+    window.location.href = paymentRedirect.checkoutUrl;
+  };
+
   const handleRegister = async (workshopId) => {
     setBusyId(workshopId);
     setError('');
@@ -137,7 +170,11 @@ const StudentDashboard = () => {
           localStorage.setItem('pendingOrderCode', payload.order_code);
           console.log('[handleRegister] Stored order code:', payload.order_code);
         }
-        window.location.href = payload.checkout_url;
+        setPaymentRedirect({
+          checkoutUrl: payload.checkout_url,
+          orderCode: payload.order_code,
+          workshopTitle: selectedWorkshop?.title || 'đơn hàng thanh toán',
+        });
       } else {
         console.log('[handleRegister] No checkout_url, checking for message...');
         if (payload.message) {
@@ -303,16 +340,25 @@ const StudentDashboard = () => {
               </div>
             )}
             {workshopImages.length > 0 ? (
-              <div className="grid grid-cols-3 gap-2">
-                {workshopImages.map((img, idx) => (
-                  <img
-                    key={img.id || idx}
-                    src={img.cdn_medium || img.cdn_url}
-                    alt={`Ảnh ${idx + 1}`}
-                    className="h-32 w-full rounded-lg border border-border object-cover"
-                  />
-                ))}
-              </div>
+              <section className="grid gap-3">
+                <h3 className="font-display text-base font-semibold text-primary">Hình ảnh</h3>
+                <div className="grid grid-cols-2 gap-2">
+                  {workshopImages.map((img, idx) => (
+                    <button
+                      key={img.id || idx}
+                      type="button"
+                      onClick={() => setLightboxImage(img.cdn_large || img.cdn_url)}
+                      className="overflow-hidden rounded-lg border border-border transition-opacity hover:opacity-90"
+                    >
+                      <img
+                        src={img.cdn_medium || img.cdn_url}
+                        alt={`Ảnh ${idx + 1}`}
+                        className="h-40 w-full object-cover"
+                      />
+                    </button>
+                  ))}
+                </div>
+              </section>
             ) : null}
             <section className="grid gap-3 rounded-xl border border-border bg-surface p-5">
               <div className="flex flex-wrap items-start justify-between gap-3">
@@ -443,6 +489,70 @@ const StudentDashboard = () => {
           </div>
         ) : null}
       </Modal>
+
+      <Modal
+        isOpen={Boolean(paymentRedirect)}
+        onClose={closePaymentRedirect}
+        title="Lưu mã đơn hàng"
+        description="Copy mã đơn hàng này trước khi chuyển sang PayOS."
+        size="sm"
+      >
+        {paymentRedirect ? (
+          <div className="grid gap-4">
+            <div className="rounded-xl border border-border bg-background px-4 py-3">
+              <p className="text-xs font-medium uppercase tracking-wide text-text-secondary">
+                Mã đơn hàng
+              </p>
+              <p className="mt-2 break-all font-mono text-lg font-semibold text-primary">
+                {paymentRedirect.orderCode || 'Chưa có mã'}
+              </p>
+              <p className="mt-2 text-sm text-text-secondary">
+                Workshop: {paymentRedirect.workshopTitle}
+              </p>
+            </div>
+
+            <div className="flex flex-wrap gap-3">
+              <button
+                type="button"
+                onClick={handleCopyOrderCode}
+                className="rounded-lg border border-border px-4 py-2 text-sm font-medium text-text-secondary transition-colors hover:bg-hover hover:text-primary"
+              >
+                Copy mã
+              </button>
+              <button
+                type="button"
+                onClick={handleContinueToPayOS}
+                className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white transition-opacity hover:opacity-90"
+              >
+                Sang PayOS
+              </button>
+            </div>
+
+            {copyStatus ? (
+              <p className="text-sm text-success">{copyStatus}</p>
+            ) : (
+              <p className="text-sm text-text-secondary">
+                Nếu quên mã này, bạn vẫn có thể xem lại trong mục Lịch sử Thanh toán.
+              </p>
+            )}
+          </div>
+        ) : null}
+      </Modal>
+
+      {lightboxImage ? (
+        <div
+          className="fixed inset-0 z-[60] flex items-center justify-center bg-primary/80 p-4"
+          onClick={() => setLightboxImage(null)}
+          role="button"
+          tabIndex={-1}
+        >
+          <img
+            src={lightboxImage}
+            alt="Ảnh phóng to"
+            className="max-h-[90vh] max-w-full rounded-xl object-contain"
+          />
+        </div>
+      ) : null}
     </PageShell>
   );
 };

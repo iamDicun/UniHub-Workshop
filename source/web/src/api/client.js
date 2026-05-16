@@ -174,3 +174,11 @@ export const deleteWorkshopImage = async (workshopId, imageId) => {
   const response = await apiClient.delete(`/workshops/${workshopId}/images/${imageId}`);
   return response.data;
 };
+
+// ============================
+// ADMIN STATS API
+// ============================
+export const fetchAdminStats = async () => {
+  const response = await apiClient.get('/workshops/stats');
+  return response.data.data;
+};

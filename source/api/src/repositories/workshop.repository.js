@@ -193,3 +193,57 @@ export const listWorkshopRegistrations = async (workshopId) => {
   );
   return rows;
 };
+
+export const getAdminStats = async () => {
+  const { rows } = await pool.query(`
+    SELECT
+      (SELECT COUNT(*) FROM workshops) AS total_workshops,
+      (SELECT COUNT(*) FROM workshops WHERE start_time > NOW()) AS upcoming_workshops,
+      (SELECT COUNT(*) FROM registrations) AS total_registrations,
+      (SELECT COUNT(*) FROM registrations WHERE status = 'confirmed') AS confirmed_registrations,
+      (SELECT COUNT(*) FROM checkins) AS total_checkins,
+      (SELECT COALESCE(SUM(amount), 0) FROM payments WHERE status = 'paid') AS total_revenue,
+      (SELECT COUNT(*) FROM users WHERE role = 'student') AS total_students,
+      (SELECT COUNT(*) FROM users WHERE role = 'staff') AS total_staff
+  `);
+  return rows[0];
+};
+
+export const getWorkshopOccupancy = async () => {
+  const { rows } = await pool.query(`
+    SELECT
+      w.id,
+      w.title,
+      w.capacity,
+      w.available_seats,
+      w.start_time,
+      CASE WHEN w.capacity > 0
+        THEN ROUND((w.capacity - w.available_seats)::numeric / w.capacity * 100, 1)
+        ELSE 0
+      END AS occupancy_pct,
+      (SELECT COUNT(*) FROM registrations r WHERE r.workshop_id = w.id AND r.status = 'confirmed') AS registered
+    FROM workshops w
+    WHERE w.start_time > NOW() - INTERVAL '30 days'
+    ORDER BY w.start_time ASC
+    LIMIT 10
+  `);
+  return rows;
+};
+
+export const getRecentCheckins = async (limit = 10) => {
+  const { rows } = await pool.query(`
+    SELECT
+      c.id,
+      c.checkin_time,
+      u.name AS student_name,
+      u.email AS student_email,
+      w.title AS workshop_title
+    FROM checkins c
+    JOIN registrations r ON r.id = c.registration_id
+    JOIN users u ON u.id = r.student_id
+    JOIN workshops w ON w.id = r.workshop_id
+    ORDER BY c.checkin_time DESC
+    LIMIT $1
+  `, [limit]);
+  return rows;
+};

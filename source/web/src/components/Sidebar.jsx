@@ -20,6 +20,7 @@ const navConfigs = {
   admin: [
     { label: 'Tổng quan', icon: LayoutDashboard, to: '/admin' },
     { label: 'Workshops', icon: Calendar, to: '/admin' },
+    { label: 'Thống kê', icon: BarChart3, to: '/admin/stats' },
     { label: 'Giao dịch', icon: CreditCard, to: '/admin/payments' },
     { label: 'Đồng bộ SV', icon: Upload, to: '/admin/sync-users' },
     { label: 'System Status', icon: Shield, to: '/admin/failed-jobs' },

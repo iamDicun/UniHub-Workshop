@@ -7,6 +7,7 @@ import {
   getWorkshopRegistrations,
 } from '../services/workshop.service.js';
 import { aiGenerateWorkshop } from '../services/workshopAI.service.js';
+import { getDashboardStats } from '../services/stats.service.js';
 import {
   addWorkshopImage,
   listWorkshopImages,
@@ -151,6 +152,15 @@ export const deleteWorkshopImageHandler = async (req, res, next) => {
     if (error.statusCode) {
       return res.status(error.statusCode).json({ message: error.message });
     }
+    next(error);
+  }
+};
+
+export const getStatsHandler = async (req, res, next) => {
+  try {
+    const stats = await getDashboardStats();
+    res.status(200).json({ status: 'success', data: stats });
+  } catch (error) {
     next(error);
   }
 };

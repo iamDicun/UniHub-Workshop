@@ -35,54 +35,54 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-6">
-      <div className="w-full max-w-md rounded-3xl bg-white/85 p-10 shadow-[0_30px_70px_-50px_rgba(15,76,92,0.6)] backdrop-blur border border-brand-200 animate-rise">
+    <div className="flex min-h-screen items-center justify-center bg-background p-6">
+      <div className="w-full max-w-md animate-rise rounded-xl border border-border bg-surface p-10 shadow-modal">
         <div className="mb-10 text-center">
-          <h1 className="font-display text-3xl font-semibold tracking-tight text-brand-900 mb-2">
+          <h1 className="font-display text-2xl font-semibold tracking-tight text-primary">
             UniHub Workshop
           </h1>
-          <p className="text-brand-900/60 text-sm">
+          <p className="mt-2 text-sm text-text-secondary">
             Đăng nhập để quản lý đăng ký và check-in.
           </p>
         </div>
-        
+
         <form onSubmit={handleLogin} className="flex flex-col gap-5">
           {error && (
-            <div className="bg-red-50 text-red-700 p-3 rounded-lg text-sm font-medium text-center border border-red-100">
+            <div className="rounded-lg border border-error/20 bg-error-container px-4 py-3 text-sm font-medium text-error text-center">
               {error}
             </div>
           )}
 
           <div className="flex flex-col gap-2">
-            <label htmlFor="email" className="text-sm font-medium text-brand-900">Email</label>
-            <input 
+            <label htmlFor="email" className="text-sm font-medium text-primary">Email</label>
+            <input
               id="email"
-              type="email" 
+              type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="student@university.edu"
-              required 
-              className="w-full rounded-2xl border border-brand-200 bg-white px-4 py-3 text-brand-900 placeholder:text-brand-900/40 focus:outline-none focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 transition-all duration-200"
-            />
-          </div>
-          
-          <div className="flex flex-col gap-2">
-            <label htmlFor="password" className="text-sm font-medium text-brand-900">Mật khẩu</label>
-            <input 
-              id="password"
-              type="password" 
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Enter your password"
-              required 
-              className="w-full rounded-2xl border border-brand-200 bg-white px-4 py-3 text-brand-900 placeholder:text-brand-900/40 focus:outline-none focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 transition-all duration-200"
+              required
+              className="w-full rounded-lg border border-border bg-background px-4 py-3 text-sm text-primary placeholder:text-text-secondary focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent/10 transition-colors duration-150"
             />
           </div>
 
-          <button 
-            type="submit" 
+          <div className="flex flex-col gap-2">
+            <label htmlFor="password" className="text-sm font-medium text-primary">Mật khẩu</label>
+            <input
+              id="password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Enter your password"
+              required
+              className="w-full rounded-lg border border-border bg-background px-4 py-3 text-sm text-primary placeholder:text-text-secondary focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent/10 transition-colors duration-150"
+            />
+          </div>
+
+          <button
+            type="submit"
             disabled={isLoading}
-            className="w-full mt-2 rounded-2xl bg-brand-500 text-white font-semibold px-6 py-3 hover:bg-brand-600 disabled:opacity-60 disabled:cursor-not-allowed transition-all duration-300 ease-out active:scale-[0.98]"
+            className="mt-2 w-full rounded-lg bg-primary px-6 py-3 text-sm font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-60"
           >
             {isLoading ? 'Đang đăng nhập...' : 'Đăng nhập'}
           </button>

@@ -336,21 +336,21 @@ const AdminWorkshops = () => {
 
   return (
     <PageShell
-      title="Quản trị workshop"
-      subtitle="Tạo, cập nhật và theo dõi danh sách đăng ký theo từng workshop."
+      title="Quản trị Workshop"
+      subtitle="Tạo, cập nhật và theo dõi danh sách đăng ký."
       actions={
-        <div className="flex flex-wrap gap-3">
+        <div className="flex flex-wrap gap-2">
           <button
             type="button"
             onClick={openCreateModal}
-            className="rounded-full bg-brand-500 px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-600"
+            className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white transition-opacity hover:opacity-90"
           >
             Tạo workshop
           </button>
           <button
             type="button"
             onClick={loadWorkshops}
-            className="rounded-full border border-brand-200 px-4 py-2 text-sm font-semibold text-brand-700 transition hover:border-brand-500 hover:text-brand-900"
+            className="rounded-lg border border-border px-3 py-1.5 text-sm font-medium text-text-secondary transition-colors hover:bg-hover hover:text-primary"
           >
             Tải lại
           </button>
@@ -358,19 +358,19 @@ const AdminWorkshops = () => {
       }
     >
       {error ? (
-        <div className="rounded-2xl border border-red-200 bg-red-50 px-5 py-4 text-sm text-red-700">
+        <div className="rounded-lg border border-error/20 bg-error-container px-4 py-3 text-sm text-error">
           {error}
         </div>
       ) : null}
 
       {loading ? (
-        <div className="rounded-3xl border border-brand-200 bg-white/70 p-6 text-sm text-brand-900/70">
+        <div className="rounded-xl border border-border bg-surface p-6 text-sm text-text-secondary shadow-soft">
           Đang tải workshop...
         </div>
       ) : null}
 
       {!loading && sortedWorkshops.length === 0 ? (
-        <div className="rounded-3xl border border-brand-200 bg-white/70 p-6 text-sm text-brand-900/70">
+        <div className="rounded-xl border border-border bg-surface p-6 text-sm text-text-secondary shadow-soft">
           Chưa có workshop nào.
         </div>
       ) : null}
@@ -379,49 +379,49 @@ const AdminWorkshops = () => {
         {sortedWorkshops.map((workshop) => (
           <article
             key={workshop.id}
-            className="rounded-3xl border border-brand-200/80 bg-white/80 p-5 shadow-[0_24px_60px_-48px_rgba(15,76,92,0.45)] backdrop-blur"
+            className="rounded-xl border border-border bg-surface p-5 shadow-soft"
           >
             <div className="flex items-start justify-between gap-3">
-              <div className="flex-1 min-w-0">
-                <h3 className="font-display text-lg font-semibold text-brand-900 text-fade">
+              <div className="min-w-0 flex-1">
+                <h3 className="font-display text-base font-semibold text-primary text-fade">
                   {workshop.title}
                 </h3>
-                <p className="mt-1 text-sm text-brand-900/70">
+                <p className="mt-1 text-sm text-text-secondary">
                   {formatDateTime(workshop.start_time)}
                 </p>
-                <p className="mt-1 text-xs text-brand-900/60">
+                <p className="mt-1 text-xs text-text-secondary">
                   {workshop.location || 'Đang cập nhật'}
                 </p>
               </div>
               <div className="text-right">
-                <span className="rounded-full bg-brand-100 px-3 py-1 text-xs font-semibold uppercase text-brand-700">
+                <span className="rounded-lg bg-hover px-2.5 py-1 text-xs font-medium text-text-secondary">
                   {workshop.available_seats}/{workshop.capacity}
                 </span>
-                <p className="mt-2 text-xs text-brand-900/60">{formatPrice(workshop.price)}</p>
+                <p className="mt-2 text-xs text-text-secondary">{formatPrice(workshop.price)}</p>
               </div>
             </div>
 
-            <p className="mt-3 text-sm text-brand-900/70">{getSnippet(workshop.description)}</p>
+            <p className="mt-3 text-sm text-text-secondary">{getSnippet(workshop.description)}</p>
 
-            <div className="mt-4 flex flex-wrap gap-3">
+            <div className="mt-4 flex flex-wrap gap-2">
               <button
                 type="button"
                 onClick={() => openDetailModal(workshop)}
-                className="rounded-full border border-brand-200 px-4 py-2 text-xs font-semibold text-brand-700 transition hover:border-brand-500 hover:text-brand-900"
+                className="rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-text-secondary transition-colors hover:bg-hover hover:text-primary"
               >
                 Xem chi tiết
               </button>
               <button
                 type="button"
                 onClick={() => openEditModal(workshop)}
-                className="rounded-full border border-brand-200 px-4 py-2 text-xs font-semibold text-brand-700 transition hover:border-brand-500 hover:text-brand-900"
+                className="rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-text-secondary transition-colors hover:bg-hover hover:text-primary"
               >
                 Chỉnh sửa
               </button>
               <button
                 type="button"
                 onClick={() => handleDelete(workshop.id)}
-                className="rounded-full border border-red-200 px-4 py-2 text-xs font-semibold text-red-600 transition hover:border-red-300"
+                className="rounded-lg border border-error/20 px-3 py-1.5 text-xs font-medium text-error transition-colors hover:bg-error-container"
               >
                 Xóa
               </button>
@@ -438,22 +438,24 @@ const AdminWorkshops = () => {
         size="xl"
       >
         <form onSubmit={handleSubmit} className="grid gap-5">
-          <label className="text-xs font-semibold uppercase tracking-wide text-brand-700">
-            Tiêu đề
+          <div className="flex flex-col gap-1.5">
+            <label className="text-sm font-medium text-primary">
+              Tiêu đề
+            </label>
             <input
               value={form.title}
               onChange={handleChange('title')}
               required
-              className="mt-2 w-full rounded-2xl border border-brand-200 bg-white px-4 py-3 text-sm text-brand-900 outline-none focus:border-brand-500"
+              className="w-full rounded-lg border border-border bg-background px-4 py-2.5 text-sm text-primary outline-none focus:border-accent focus:ring-1 focus:ring-accent/10 transition-colors duration-150"
             />
-          </label>
+          </div>
 
           <div className="grid gap-2">
             <div className="flex items-center justify-between">
-              <label className="text-xs font-semibold uppercase tracking-wide text-brand-700">
+              <label className="text-sm font-medium text-primary">
                 Mô tả
               </label>
-              <label className="cursor-pointer rounded-full bg-brand-100 px-3 py-1 text-xs font-semibold text-brand-700 transition hover:bg-brand-200">
+              <label className="cursor-pointer rounded-lg bg-hover px-3 py-1.5 text-xs font-medium text-text-secondary transition-colors hover:bg-border">
                 Upload PDF Tóm Tắt AI
                 <input type="file" accept="application/pdf" className="hidden" onChange={handlePdfUpload} />
               </label>
@@ -462,77 +464,89 @@ const AdminWorkshops = () => {
           </div>
 
           <div className="grid gap-3 md:grid-cols-2">
-            <label className="text-xs font-semibold uppercase tracking-wide text-brand-700">
-              Sức chứa
+            <div className="flex flex-col gap-1.5">
+              <label className="text-sm font-medium text-primary">
+                Sức chứa
+              </label>
               <input
                 type="number"
                 min="1"
                 value={form.capacity}
                 onChange={handleChange('capacity')}
                 required
-                className="mt-2 w-full rounded-2xl border border-brand-200 bg-white px-4 py-3 text-sm text-brand-900 outline-none focus:border-brand-500"
+                className="w-full rounded-lg border border-border bg-background px-4 py-2.5 text-sm text-primary outline-none focus:border-accent focus:ring-1 focus:ring-accent/10 transition-colors duration-150"
               />
-            </label>
-            <label className="text-xs font-semibold uppercase tracking-wide text-brand-700">
-              Giá vé (VND)
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <label className="text-sm font-medium text-primary">
+                Giá vé (VND)
+              </label>
               <input
                 type="number"
                 min="0"
                 value={form.price}
                 onChange={handleChange('price')}
-                className="mt-2 w-full rounded-2xl border border-brand-200 bg-white px-4 py-3 text-sm text-brand-900 outline-none focus:border-brand-500"
+                className="w-full rounded-lg border border-border bg-background px-4 py-2.5 text-sm text-primary outline-none focus:border-accent focus:ring-1 focus:ring-accent/10 transition-colors duration-150"
               />
-            </label>
+            </div>
           </div>
 
           <div className="grid gap-3 md:grid-cols-2">
-            <label className="text-xs font-semibold uppercase tracking-wide text-brand-700">
-              Bắt đầu
+            <div className="flex flex-col gap-1.5">
+              <label className="text-sm font-medium text-primary">
+                Bắt đầu
+              </label>
               <input
                 type="datetime-local"
                 value={form.start_time}
                 onChange={handleChange('start_time')}
                 required
-                className="mt-2 w-full rounded-2xl border border-brand-200 bg-white px-4 py-3 text-sm text-brand-900 outline-none focus:border-brand-500"
+                className="w-full rounded-lg border border-border bg-background px-4 py-2.5 text-sm text-primary outline-none focus:border-accent focus:ring-1 focus:ring-accent/10 transition-colors duration-150"
               />
-            </label>
-            <label className="text-xs font-semibold uppercase tracking-wide text-brand-700">
-              Kết thúc
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <label className="text-sm font-medium text-primary">
+                Kết thúc
+              </label>
               <input
                 type="datetime-local"
                 value={form.end_time}
                 onChange={handleChange('end_time')}
                 required
-                className="mt-2 w-full rounded-2xl border border-brand-200 bg-white px-4 py-3 text-sm text-brand-900 outline-none focus:border-brand-500"
+                className="w-full rounded-lg border border-border bg-background px-4 py-2.5 text-sm text-primary outline-none focus:border-accent focus:ring-1 focus:ring-accent/10 transition-colors duration-150"
               />
-            </label>
+            </div>
           </div>
 
           <div className="grid gap-3 md:grid-cols-2">
-            <label className="text-xs font-semibold uppercase tracking-wide text-brand-700">
-              Địa điểm
+            <div className="flex flex-col gap-1.5">
+              <label className="text-sm font-medium text-primary">
+                Địa điểm
+              </label>
               <input
                 value={form.location}
                 onChange={handleChange('location')}
-                className="mt-2 w-full rounded-2xl border border-brand-200 bg-white px-4 py-3 text-sm text-brand-900 outline-none focus:border-brand-500"
+                className="w-full rounded-lg border border-border bg-background px-4 py-2.5 text-sm text-primary outline-none focus:border-accent focus:ring-1 focus:ring-accent/10 transition-colors duration-150"
               />
-            </label>
-            <label className="text-xs font-semibold uppercase tracking-wide text-brand-700">
-              Diễn giả
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <label className="text-sm font-medium text-primary">
+                Diễn giả
+              </label>
               <input
                 value={form.speaker}
                 onChange={handleChange('speaker')}
-                className="mt-2 w-full rounded-2xl border border-brand-200 bg-white px-4 py-3 text-sm text-brand-900 outline-none focus:border-brand-500"
+                className="w-full rounded-lg border border-border bg-background px-4 py-2.5 text-sm text-primary outline-none focus:border-accent focus:ring-1 focus:ring-accent/10 transition-colors duration-150"
               />
-            </label>
+            </div>
           </div>
 
           <div className="grid gap-2">
             <div className="flex items-center justify-between">
-              <label className="text-xs font-semibold uppercase tracking-wide text-brand-700">
+              <label className="text-sm font-medium text-primary">
                 Sơ đồ phòng (URL)
               </label>
-              <label className="cursor-pointer rounded-full bg-brand-100 px-3 py-1 text-xs font-semibold text-brand-700 transition hover:bg-brand-200">
+              <label className="cursor-pointer rounded-lg bg-hover px-3 py-1.5 text-xs font-medium text-text-secondary transition-colors hover:bg-border">
                 Tải ảnh lên (S3)
                 <input type="file" accept="image/*" className="hidden" onChange={async (e) => {
                   const file = e.target.files[0];
@@ -555,32 +569,34 @@ const AdminWorkshops = () => {
               value={form.room_map_url}
               onChange={handleChange('room_map_url')}
               placeholder="Nhập link sơ đồ phòng hoặc bấm tải ảnh lên..."
-              className="w-full rounded-2xl border border-brand-200 bg-white px-4 py-3 text-sm text-brand-900 outline-none focus:border-brand-500"
+              className="w-full rounded-lg border border-border bg-background px-4 py-2.5 text-sm text-primary outline-none focus:border-accent focus:ring-1 focus:ring-accent/10 transition-colors duration-150"
             />
           </div>
 
-          <label className="text-xs font-semibold uppercase tracking-wide text-brand-700">
-            Danh sách Staff Check-in (Email, cách nhau bằng dấu phẩy)
+          <div className="flex flex-col gap-1.5">
+            <label className="text-sm font-medium text-primary">
+              Danh sách Staff Check-in (Email, cách nhau bằng dấu phẩy)
+            </label>
             <input
               value={form.staffEmails}
               onChange={handleChange('staffEmails')}
               placeholder="Ví dụ: staff1@unihub.com, staff2@unihub.com"
-              className="mt-2 w-full rounded-2xl border border-brand-200 bg-white px-4 py-3 text-sm text-brand-900 outline-none focus:border-brand-500"
+              className="w-full rounded-lg border border-border bg-background px-4 py-2.5 text-sm text-primary outline-none focus:border-accent focus:ring-1 focus:ring-accent/10 transition-colors duration-150"
             />
-          </label>
+          </div>
 
           <div className="flex flex-wrap gap-3">
             <button
               type="submit"
               disabled={saving}
-              className="rounded-full bg-brand-500 px-5 py-2 text-sm font-semibold text-white transition hover:bg-brand-600 disabled:opacity-60"
+              className="rounded-lg bg-primary px-4 py-2.5 text-sm font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-60"
             >
               {saving ? 'Đang lưu...' : editingId ? 'Cập nhật workshop' : 'Tạo workshop'}
             </button>
             <button
               type="button"
               onClick={closeForm}
-              className="rounded-full border border-brand-200 px-4 py-2 text-sm font-semibold text-brand-700 transition hover:border-brand-500 hover:text-brand-900"
+              className="rounded-lg border border-border px-4 py-2 text-sm font-medium text-text-secondary transition-colors hover:bg-hover hover:text-primary"
             >
               Hủy
             </button>
@@ -597,50 +613,50 @@ const AdminWorkshops = () => {
       >
         {selectedWorkshop ? (
           <div className="grid gap-6">
-            <section className="grid gap-4 rounded-3xl border border-brand-200/70 bg-white/80 p-5">
+            <section className="grid gap-4 rounded-xl border border-border bg-surface p-5">
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div>
-                  <p className="text-sm text-brand-900/70">Thời gian</p>
-                  <p className="text-sm text-brand-900">
+                  <p className="text-sm text-text-secondary">Thời gian</p>
+                  <p className="text-sm text-primary">
                     {formatDateTime(selectedWorkshop.start_time)} -
                     {` ${formatDateTime(selectedWorkshop.end_time)}`}
                   </p>
                 </div>
                 <div className="text-right">
-                  <p className="text-sm text-brand-900/70">Chỗ trống</p>
-                  <p className="text-sm text-brand-900">
+                  <p className="text-sm text-text-secondary">Chỗ trống</p>
+                  <p className="text-sm text-primary">
                     {selectedWorkshop.available_seats}/{selectedWorkshop.capacity}
                   </p>
                 </div>
               </div>
-              <div className="grid gap-1 text-sm text-brand-900/70">
+              <div className="grid gap-1 text-sm text-text-secondary">
                 <p>
-                  <span className="font-semibold text-brand-900">Diễn giả:</span>{' '}
+                  <span className="font-medium text-primary">Diễn giả:</span>{' '}
                   {selectedWorkshop.speaker || 'Đang cập nhật'}
                 </p>
                 <p>
-                  <span className="font-semibold text-brand-900">Địa điểm:</span>{' '}
+                  <span className="font-medium text-primary">Địa điểm:</span>{' '}
                   {selectedWorkshop.location || 'Đang cập nhật'}
                 </p>
                 {selectedWorkshop.room_map_url && (
                   <p>
-                    <span className="font-semibold text-brand-900">Sơ đồ phòng:</span>{' '}
-                    <a href={selectedWorkshop.room_map_url} target="_blank" rel="noreferrer" className="text-brand-600 hover:underline">
+                    <span className="font-medium text-primary">Sơ đồ phòng:</span>{' '}
+                    <a href={selectedWorkshop.room_map_url} target="_blank" rel="noreferrer" className="text-accent hover:underline">
                       Xem sơ đồ
                     </a>
                   </p>
                 )}
                 <p>
-                  <span className="font-semibold text-brand-900">Giá vé:</span>{' '}
+                  <span className="font-medium text-primary">Giá vé:</span>{' '}
                   {formatPrice(selectedWorkshop.price)}
                 </p>
               </div>
-              <div className="rounded-2xl border border-brand-200 bg-brand-50 px-4 py-3">
-                <p className="text-xs font-semibold uppercase tracking-wide text-brand-700">
+              <div className="rounded-lg border border-border bg-background px-4 py-3">
+                <p className="text-sm font-medium text-primary">
                   Mô tả
                 </p>
                 <div
-                  className="mt-2 text-sm text-brand-900/80 leading-relaxed"
+                  className="mt-2 text-sm text-text-secondary leading-relaxed"
                   dangerouslySetInnerHTML={{
                     __html:
                       selectedWorkshop.description || '<em>Chưa có mô tả chi tiết.</em>',
@@ -650,42 +666,42 @@ const AdminWorkshops = () => {
             </section>
 
             <section className="grid gap-3">
-              <h3 className="font-display text-lg font-semibold text-brand-900">
+              <h3 className="font-display text-lg font-semibold text-primary">
                 Danh sách sinh viên đăng ký
               </h3>
 
               {registrationsError ? (
-                <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                <div className="rounded-lg border border-error/20 bg-error-container px-4 py-3 text-sm text-error">
                   {registrationsError}
                 </div>
               ) : null}
 
               {registrationsLoading ? (
-                <div className="rounded-2xl border border-brand-200 bg-white/70 px-4 py-3 text-sm text-brand-900/70">
+                <div className="rounded-lg border border-border bg-surface px-4 py-3 text-sm text-text-secondary">
                   Đang tải danh sách đăng ký...
                 </div>
               ) : null}
 
               {!registrationsLoading && registrations.length === 0 ? (
-                <div className="rounded-2xl border border-brand-200 bg-white/70 px-4 py-3 text-sm text-brand-900/70">
+                <div className="rounded-lg border border-border bg-surface px-4 py-3 text-sm text-text-secondary">
                   Chưa có sinh viên đăng ký.
                 </div>
               ) : null}
 
-              <div className="grid gap-3">
+              <div className="grid gap-2">
                 {registrations.map((item) => (
                   <div
                     key={item.registration_id}
-                    className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-brand-200/70 bg-white px-4 py-3"
+                    className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-border bg-surface px-4 py-3"
                   >
                     <div>
-                      <p className="text-sm font-semibold text-brand-900">{item.student_name}</p>
-                      <p className="text-xs text-brand-900/60">
+                      <p className="text-sm font-medium text-primary">{item.student_name}</p>
+                      <p className="text-xs text-text-secondary">
                         {item.student_email} · {item.student_code || 'Chưa có mã SV'}
                       </p>
                     </div>
-                    <div className="text-right text-xs text-brand-900/60">
-                      <p className="font-semibold text-brand-700">
+                    <div className="text-right text-xs text-text-secondary">
+                      <p className="font-medium text-primary">
                         {item.registration_status === 'confirmed' ? 'Đã xác nhận' : 'Đã hủy'}
                       </p>
                       <p>
@@ -699,44 +715,44 @@ const AdminWorkshops = () => {
               </div>
             </section>
 
-            <section className="grid gap-3 border-t border-brand-200 pt-5">
-              <h3 className="font-display text-lg font-semibold text-brand-900">
+            <section className="grid gap-3 border-t border-border pt-5">
+              <h3 className="font-display text-lg font-semibold text-primary">
                 Nhân sự Check-in (Staff)
               </h3>
-              
+
               <div className="flex gap-2">
-                <input 
-                  type="email" 
+                <input
+                  type="email"
                   value={newStaffEmail}
                   onChange={(e) => setNewStaffEmail(e.target.value)}
                   placeholder="Nhập email nhân viên..."
-                  className="flex-1 rounded-full border border-brand-200 px-4 py-2 text-sm outline-none focus:border-brand-500"
+                  className="flex-1 rounded-lg border border-border bg-background px-4 py-2 text-sm outline-none focus:border-accent transition-colors duration-150"
                 />
-                <button 
+                <button
                   type="button"
                   onClick={handleAddStaff}
-                  className="rounded-full bg-brand-500 px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-600"
+                  className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white transition-opacity hover:opacity-90"
                 >
                   Thêm
                 </button>
               </div>
 
               {staffLoading ? (
-                <div className="text-sm text-brand-900/70">Đang tải danh sách staff...</div>
+                <div className="text-sm text-text-secondary">Đang tải danh sách staff...</div>
               ) : (
                 <div className="grid gap-2 mt-2">
                   {workshopStaff.length === 0 ? (
-                    <div className="text-sm text-brand-900/70">Chưa có staff nào được phân công.</div>
+                    <div className="text-sm text-text-secondary">Chưa có staff nào được phân công.</div>
                   ) : (
                     workshopStaff.map((staff) => (
-                      <div key={staff.id} className="flex items-center justify-between rounded-xl bg-brand-50 px-4 py-2">
+                      <div key={staff.id} className="flex items-center justify-between rounded-lg bg-background px-4 py-2 border border-border">
                         <div>
-                          <p className="text-sm font-semibold text-brand-900">{staff.name}</p>
-                          <p className="text-xs text-brand-900/60">{staff.email}</p>
+                          <p className="text-sm font-medium text-primary">{staff.name}</p>
+                          <p className="text-xs text-text-secondary">{staff.email}</p>
                         </div>
-                        <button 
+                        <button
                           onClick={() => handleRemoveStaff(staff.id)}
-                          className="text-xs font-semibold text-red-600 hover:text-red-800"
+                          className="text-xs font-medium text-error transition-colors hover:underline"
                         >
                           Xóa
                         </button>
@@ -757,7 +773,7 @@ const AdminWorkshops = () => {
         size="sm"
       >
         <div className="grid gap-6">
-          <p className="text-sm text-brand-900/80 leading-relaxed">
+          <p className="text-sm text-text-secondary leading-relaxed">
             {alertConfig.message}
           </p>
           <div className="flex justify-end gap-3">
@@ -765,7 +781,7 @@ const AdminWorkshops = () => {
               <button
                 type="button"
                 onClick={closeAlert}
-                className="rounded-full border border-brand-200 px-5 py-2 text-sm font-semibold text-brand-700 transition hover:border-brand-500"
+                className="rounded-lg border border-border px-4 py-2 text-sm font-medium text-text-secondary transition-colors hover:bg-hover"
               >
                 Hủy
               </button>
@@ -778,7 +794,7 @@ const AdminWorkshops = () => {
                 }
                 closeAlert();
               }}
-              className="rounded-full bg-brand-500 px-6 py-2 text-sm font-semibold text-white transition hover:bg-brand-600"
+              className="rounded-lg bg-primary px-5 py-2 text-sm font-medium text-white transition-opacity hover:opacity-90"
             >
               {alertConfig.isConfirm ? 'Xác nhận' : 'Đóng'}
             </button>

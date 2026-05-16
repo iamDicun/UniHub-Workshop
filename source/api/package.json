@@ -10,7 +10,7 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "format": "prettier --write \"src/**/*.js\"",
-    "prepare": "cd .. && husky install api/.husky"
+    "prepare": "node -e \"if (!process.env.CI) { require('child_process').execSync('cd .. && husky install api/.husky', { stdio: 'inherit', shell: true }) }\""
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1046.0",

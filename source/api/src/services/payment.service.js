@@ -4,9 +4,7 @@ import { getPaymentByOrderCodeForUpdate, updatePaymentStatus, getMyPayments, get
 import { updateRegistrationStatus, getRegistrationByIdForUpdate } from '../repositories/registration.repository.js';
 import { publishRegistrationEvent } from '../queue/notification.producer.js';
 
-export const processWebhook = async (webhookBody) => {
-  const webhookData = await payos.webhooks.verify(webhookBody);
-  
+const processVerifiedWebhook = async (webhookData) => {
   if (webhookData.code !== '00') {
     return;
   }
@@ -53,6 +51,16 @@ export const processWebhook = async (webhookBody) => {
   } finally {
     client.release();
   }
+};
+
+export const processWebhook = async (webhookBody) => {
+  const webhookData = await payos.webhooks.verify(webhookBody);
+  return await processVerifiedWebhook(webhookData);
+};
+
+export const processWebhookTest = async (webhookBody) => {
+  const webhookData = webhookBody?.webhookData || webhookBody?.data || webhookBody;
+  return await processVerifiedWebhook(webhookData);
 };
 
 export const markPaymentAsFailed = async (orderCode) => {

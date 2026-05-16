@@ -10,6 +10,7 @@ import StudentPayments from './pages/StudentPayments';
 import StaffDashboard from './pages/StaffDashboard';
 import Profile from './pages/Profile';
 import QrGenerator from './pages/QrGenerator';
+import AdminStats from './pages/AdminStats';
 import { getHomeForRole, getStoredUser } from './utils/auth';
 
 const RoleRoute = ({ roles, children }) => {
@@ -81,6 +82,14 @@ function App() {
           element={
             <RoleRoute roles={['admin']}>
               <AdminSyncUsers />
+            </RoleRoute>
+          }
+        />
+        <Route
+          path="/admin/stats"
+          element={
+            <RoleRoute roles={['admin']}>
+              <AdminStats />
             </RoleRoute>
           }
         />

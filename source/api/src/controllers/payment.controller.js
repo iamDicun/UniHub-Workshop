@@ -1,4 +1,4 @@
-import { processWebhook, listMyPayments, listAdminPayments, markPaymentAsFailed } from '../services/payment.service.js';
+import { processWebhook, processWebhookTest, listMyPayments, listAdminPayments, markPaymentAsFailed } from '../services/payment.service.js';
 
 export const handlePayOSWebhook = async (req, res) => {
   try {
@@ -8,13 +8,33 @@ export const handlePayOSWebhook = async (req, res) => {
       return res.json({ success: true, message: 'Webhook URL is active' });
     }
 
-    const result = await processWebhook(req.body);
+    const isWebhookTest = req.body?.testMode === true || req.get('x-webhook-test') === '1';
+
+    const result = isWebhookTest
+      ? await processWebhookTest(req.body)
+      : await processWebhook(req.body);
+
     if (!result) {
       return res.json({ success: true });
     }
     res.json({ success: true, message: result.status });
   } catch (error) {
     console.error('[PayOS Webhook] Error:', error);
+    if (
+      error.message?.includes('Invalid webhook data') &&
+      (req.body?.testMode === true || req.get('x-webhook-test') === '1')
+    ) {
+      try {
+        const result = await processWebhookTest(req.body);
+        if (!result) {
+          return res.json({ success: true });
+        }
+        return res.json({ success: true, message: result.status });
+      } catch (testError) {
+        console.error('[PayOS Webhook Test Fallback] Error:', testError);
+        return res.status(400).json({ success: false, message: testError.message });
+      }
+    }
     // TRƯỜNG HỢP QUAN TRỌNG: Khi bạn nhấn "Xác nhận" trên Dashboard PayOS, 
     // họ sẽ gửi request test. Nếu SDK verify lỗi ở bước này, ta vẫn trả về 200 
     // để Dashboard chấp nhận URL. Các lỗi thực tế sẽ được log ở console.

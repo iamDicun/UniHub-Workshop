@@ -276,3 +276,16 @@ ALTER TABLE payments ADD COLUMN IF NOT EXISTS description TEXT;  -- Mô tả tha
 -- Thay vì chỉ thêm cột, hãy thêm ràng buộc UNIQUE và INDEX
 ALTER TABLE payments ADD COLUMN IF NOT EXISTS order_code SERIAL UNIQUE;
 CREATE INDEX IF NOT EXISTS idx_payments_order_code ON payments(order_code);
+
+
+CREATE TABLE workshop_images (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  workshop_id UUID NOT NULL REFERENCES workshops(id) ON DELETE CASCADE,
+  object_key TEXT NOT NULL,
+  cdn_url TEXT NOT NULL,
+  cdn_thumb TEXT NOT NULL,
+  cdn_medium TEXT NOT NULL,
+  cdn_large TEXT NOT NULL,
+  sort_order INTEGER NOT NULL DEFAULT 0,
+  created_at TIMESTAMP DEFAULT NOW()
+);

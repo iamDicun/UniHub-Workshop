@@ -125,7 +125,6 @@ const StudentDashboard = () => {
 
       if (payload.checkout_url) {
         console.log('[handleRegister] Redirecting to:', payload.checkout_url);
-        // Store order code in localStorage for cancel handling
         if (payload.order_code) {
           localStorage.setItem('pendingOrderCode', payload.order_code);
           console.log('[handleRegister] Stored order code:', payload.order_code);
@@ -135,7 +134,6 @@ const StudentDashboard = () => {
         console.log('[handleRegister] No checkout_url, checking for message...');
         if (payload.message) {
           console.log('[handleRegister] Setting error:', payload.message);
-          // Hiển thị popup thông báo ngay
           alert(payload.message);
           setError(payload.message);
         } else {
@@ -167,19 +165,19 @@ const StudentDashboard = () => {
 
   return (
     <PageShell
-      title="Bảng điều khiển sinh viên"
-      subtitle="Lọc workshop, theo dõi lịch và đăng ký nhanh chóng."
+      title="Khám phá Workshop"
+      subtitle="Lọc, theo dõi lịch và đăng ký nhanh chóng."
       actions={
-        <div className="flex flex-wrap gap-3">
+        <div className="flex flex-wrap gap-2">
           {filters.map((filter) => (
             <button
               key={filter.key}
               type="button"
               onClick={() => setActiveFilter(filter.key)}
-              className={`rounded-full px-4 py-2 text-sm font-semibold transition ${
+              className={`rounded-lg px-3 py-1.5 text-sm font-medium transition-colors duration-150 ${
                 activeFilter === filter.key
-                  ? 'bg-brand-500 text-white'
-                  : 'border border-brand-200 text-brand-700 hover:border-brand-500'
+                  ? 'bg-primary text-white'
+                  : 'border border-border text-text-secondary hover:bg-hover hover:text-primary'
               }`}
             >
               {filter.label}
@@ -188,7 +186,7 @@ const StudentDashboard = () => {
           <button
             type="button"
             onClick={loadWorkshops}
-            className="rounded-full border border-brand-200 px-4 py-2 text-sm font-semibold text-brand-700 transition hover:border-brand-500 hover:text-brand-900"
+            className="rounded-lg border border-border px-3 py-1.5 text-sm font-medium text-text-secondary transition-colors hover:bg-hover hover:text-primary"
           >
             Tải lại
           </button>
@@ -196,19 +194,19 @@ const StudentDashboard = () => {
       }
     >
       {error ? (
-        <div className="rounded-2xl border border-red-200 bg-red-50 px-5 py-4 text-sm text-red-700">
+        <div className="rounded-lg border border-error/20 bg-error-container px-4 py-3 text-sm text-error">
           {error}
         </div>
       ) : null}
 
       {loading ? (
-        <div className="rounded-3xl border border-brand-200 bg-white/70 p-8 text-sm text-brand-900/70">
+        <div className="rounded-xl border border-border bg-surface p-8 text-sm text-text-secondary shadow-soft">
           Đang tải workshop...
         </div>
       ) : null}
 
       {!loading && filteredWorkshops.length === 0 ? (
-        <div className="rounded-3xl border border-brand-200 bg-white/70 p-8 text-sm text-brand-900/70">
+        <div className="rounded-xl border border-border bg-surface p-8 text-sm text-text-secondary shadow-soft">
           Chưa có workshop phù hợp bộ lọc này.
         </div>
       ) : null}
@@ -223,28 +221,28 @@ const StudentDashboard = () => {
               key={workshop.id}
               type="button"
               onClick={() => openDetail(workshop)}
-              className="group flex w-full flex-col gap-4 rounded-3xl border border-brand-200/80 bg-white/80 p-5 text-left shadow-[0_20px_55px_-45px_rgba(15,76,92,0.45)] transition hover:border-brand-500"
+              className="flex w-full flex-col gap-3 rounded-xl border border-border bg-surface p-5 text-left shadow-soft transition-colors hover:border-accent"
             >
               <div className="flex items-start justify-between gap-4">
-                <div className="flex-1 min-w-0">
-                  <h3 className="font-display text-lg font-semibold text-brand-900 text-fade">
+                <div className="min-w-0 flex-1">
+                  <h3 className="font-display text-base font-semibold text-primary text-fade">
                     {workshop.title}
                   </h3>
-                  <p className="mt-1 text-sm text-brand-900/70">
+                  <p className="mt-1 text-sm text-text-secondary">
                     {formatDateTime(workshop.start_time)}
                   </p>
                 </div>
-                <span className="rounded-full bg-brand-100 px-3 py-1 text-xs font-semibold uppercase text-brand-700">
+                <span className="rounded-lg bg-hover px-2.5 py-1 text-xs font-medium text-text-secondary">
                   {workshop.available_seats}/{workshop.capacity}
                 </span>
               </div>
 
-              <p className="text-sm text-brand-900/70">{getSnippet(workshop.description)}</p>
+              <p className="text-sm text-text-secondary">{getSnippet(workshop.description)}</p>
 
-              <div className="flex flex-wrap items-center justify-between gap-3 text-xs text-brand-900/60">
+              <div className="flex flex-wrap items-center justify-between gap-3 text-xs text-text-secondary">
                 <span>{workshop.speaker ? `Diễn giả: ${workshop.speaker}` : 'Đang cập nhật diễn giả'}</span>
               </div>
-              <div className="flex flex-wrap items-center justify-between gap-3 text-xs text-brand-900/60">
+              <div className="flex flex-wrap items-center justify-between gap-3 text-xs text-text-secondary">
                 <span>{workshop.location || 'Đang cập nhật địa điểm'}</span>
                 <span>{formatPrice(workshop.price)}</span>
               </div>
@@ -252,21 +250,21 @@ const StudentDashboard = () => {
               <div className="flex flex-wrap items-center gap-2">
                 {isRegistered ? (
                   workshop.is_checked_in ? (
-                    <span className="rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-semibold text-emerald-700 flex items-center gap-1">
+                    <span className="inline-flex items-center gap-1 rounded-lg bg-success/10 px-2.5 py-1 text-xs font-medium text-success">
                       <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
                       Đã Check-in
                     </span>
                   ) : (
-                    <span className="rounded-full bg-brand-500/10 px-3 py-1 text-xs font-semibold text-brand-700">
+                    <span className="rounded-lg bg-accent/10 px-2.5 py-1 text-xs font-medium text-text-secondary">
                       Đã đăng ký
                     </span>
                   )
                 ) : (
-                  <span className="rounded-full bg-brand-100 px-3 py-1 text-xs font-semibold text-brand-700">
+                  <span className="rounded-lg bg-hover px-2.5 py-1 text-xs font-medium text-text-secondary">
                     {isFull ? 'Hết chỗ' : 'Còn chỗ'}
                   </span>
                 )}
-                <span className="text-xs text-brand-900/50">Nhấn để xem chi tiết</span>
+                <span className="text-xs text-text-secondary">Nhấn để xem chi tiết</span>
               </div>
             </button>
           );
@@ -283,54 +281,54 @@ const StudentDashboard = () => {
         {selectedWorkshop ? (
           <div className="grid gap-5">
             {error && (
-              <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 animate-in fade-in slide-in-from-top-1">
+              <div className="rounded-lg border border-error/20 bg-error-container px-4 py-3 text-sm text-error">
                 {error}
               </div>
             )}
-            <section className="grid gap-3 rounded-3xl border border-brand-200/70 bg-white/80 p-5">
+            <section className="grid gap-3 rounded-xl border border-border bg-surface p-5">
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div>
-                  <p className="text-sm text-brand-900/70">Thời gian</p>
-                  <p className="text-sm text-brand-900">
+                  <p className="text-sm text-text-secondary">Thời gian</p>
+                  <p className="text-sm text-primary">
                     {formatDateTime(selectedWorkshop.start_time)} -
                     {` ${formatDateTime(selectedWorkshop.end_time)}`}
                   </p>
                 </div>
                 <div className="text-right">
-                  <p className="text-sm text-brand-900/70">Chỗ trống</p>
-                  <p className="text-sm text-brand-900">
+                  <p className="text-sm text-text-secondary">Chỗ trống</p>
+                  <p className="text-sm text-primary">
                     {selectedWorkshop.available_seats}/{selectedWorkshop.capacity}
                   </p>
                 </div>
               </div>
-              <div className="grid gap-1 text-sm text-brand-900/70">
+              <div className="grid gap-1 text-sm text-text-secondary">
                 <p>
-                  <span className="font-semibold text-brand-900">Diễn giả:</span>{' '}
+                  <span className="font-medium text-primary">Diễn giả:</span>{' '}
                   {selectedWorkshop.speaker || 'Đang cập nhật'}
                 </p>
                 <p>
-                  <span className="font-semibold text-brand-900">Địa điểm:</span>{' '}
+                  <span className="font-medium text-primary">Địa điểm:</span>{' '}
                   {selectedWorkshop.location || 'Đang cập nhật'}
                 </p>
                 {selectedWorkshop.room_map_url && (
                   <p>
-                    <span className="font-semibold text-brand-900">Sơ đồ phòng:</span>{' '}
-                    <a href={selectedWorkshop.room_map_url} target="_blank" rel="noreferrer" className="text-brand-600 hover:underline">
+                    <span className="font-medium text-primary">Sơ đồ phòng:</span>{' '}
+                    <a href={selectedWorkshop.room_map_url} target="_blank" rel="noreferrer" className="text-accent hover:underline">
                       Xem sơ đồ
                     </a>
                   </p>
                 )}
                 <p>
-                  <span className="font-semibold text-brand-900">Giá vé:</span>{' '}
+                  <span className="font-medium text-primary">Giá vé:</span>{' '}
                   {formatPrice(selectedWorkshop.price)}
                 </p>
               </div>
-              <div className="rounded-2xl border border-brand-200 bg-brand-50 px-4 py-3">
-                <p className="text-xs font-semibold uppercase tracking-wide text-brand-700">
+              <div className="rounded-lg border border-border bg-background px-4 py-3">
+                <p className="text-sm font-medium text-primary">
                   Mô tả
                 </p>
                 <div
-                  className="mt-2 text-sm text-brand-900/80 leading-relaxed"
+                  className="mt-2 text-sm text-text-secondary leading-relaxed"
                   dangerouslySetInnerHTML={{
                     __html:
                       selectedWorkshop.description || '<em>Chưa có mô tả chi tiết.</em>',
@@ -341,25 +339,25 @@ const StudentDashboard = () => {
 
             {selectedWorkshop.registration_status === 'confirmed' ? (
               selectedWorkshop.is_checked_in ? (
-                <div className="rounded-2xl border border-emerald-200/70 bg-emerald-50 px-4 py-4 text-sm text-emerald-900 flex flex-col items-center justify-center">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-emerald-100 mb-3">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="text-emerald-600"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                <div className="flex flex-col items-center justify-center rounded-xl border border-success/20 bg-success/5 px-4 py-5 text-sm text-primary">
+                  <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-success/10">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="text-success"><polyline points="20 6 9 17 4 12"></polyline></svg>
                   </div>
-                  <span className="font-bold text-lg">Đã Check-in Thành Công</span>
-                  <p className="mt-1 text-emerald-700/80 text-center">Chúc bạn có một buổi workshop thú vị và bổ ích!</p>
+                  <span className="text-base font-semibold">Đã Check-in Thành Công</span>
+                  <p className="mt-1 text-text-secondary text-center">Chúc bạn có một buổi workshop thú vị và bổ ích!</p>
                 </div>
               ) : (
-                <div className="rounded-2xl border border-brand-200/70 bg-brand-50 px-4 py-3 text-xs text-brand-900">
-                  <div className="flex items-center justify-between mb-4">
-                    <span className="font-semibold">Đã đăng ký</span>
-                    <span className="rounded-full bg-white px-2 py-0.5 text-[10px] uppercase tracking-wide text-brand-500">
+                <div className="rounded-lg border border-border bg-background px-4 py-3 text-sm text-primary">
+                  <div className="mb-4 flex items-center justify-between">
+                    <span className="font-medium">Đã đăng ký</span>
+                    <span className="rounded-lg bg-surface px-2 py-0.5 text-xs text-accent border border-border">
                       Mã QR Check-in
                     </span>
                   </div>
-                  <div className="flex justify-center bg-white p-4 rounded-xl border border-brand-200">
+                  <div className="flex justify-center rounded-lg border border-border bg-surface p-4">
                     <QRCodeCanvas value={`${selectedWorkshop.id}|${selectedWorkshop.registration_id}`} size={200} />
                   </div>
-                  <p className="mt-4 text-center break-all font-mono text-[11px] text-brand-700">
+                  <p className="mt-4 text-center break-all font-mono text-xs text-text-secondary">
                     {selectedWorkshop.registration_id}
                   </p>
                 </div>
@@ -367,16 +365,16 @@ const StudentDashboard = () => {
             ) : null}
 
             {selectedWorkshop.registration_status === 'pending' ? (
-              <div className="rounded-2xl border border-yellow-200/70 bg-yellow-50 px-4 py-3 text-sm text-yellow-900">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="font-semibold">Đang chờ thanh toán</span>
+              <div className="rounded-lg border border-warning/20 bg-warning/5 px-4 py-3 text-sm text-primary">
+                <div className="mb-2 flex items-center justify-between">
+                  <span className="font-semibold text-warning">Đang chờ thanh toán</span>
                 </div>
-                <p>Bạn đã đăng ký nhưng chưa hoàn tất thanh toán. Vui lòng thanh toán để xác nhận giữ chỗ.</p>
+                <p className="text-text-secondary">Bạn đã đăng ký nhưng chưa hoàn tất thanh toán. Vui lòng thanh toán để xác nhận giữ chỗ.</p>
                 <div className="mt-4 text-center">
                   <button
                     onClick={() => handleRegister(selectedWorkshop.id)}
                     disabled={busyId === selectedWorkshop.id}
-                    className="rounded-full bg-yellow-500 px-5 py-2 text-white font-semibold hover:bg-yellow-600 transition"
+                    className="rounded-lg bg-warning px-4 py-2 text-sm font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-60"
                   >
                     {busyId === selectedWorkshop.id ? 'Đang tải...' : 'Tiếp tục thanh toán'}
                   </button>
@@ -390,7 +388,7 @@ const StudentDashboard = () => {
                   type="button"
                   onClick={() => handleCancel(selectedWorkshop.registration_id)}
                   disabled={busyId === selectedWorkshop.registration_id}
-                  className="rounded-full border border-brand-200 px-4 py-2 text-sm font-semibold text-brand-700 transition hover:border-brand-500 hover:text-brand-900 disabled:opacity-60"
+                  className="rounded-lg border border-border px-4 py-2 text-sm font-medium text-text-secondary transition-colors hover:bg-hover hover:text-primary disabled:opacity-60"
                 >
                   {busyId === selectedWorkshop.registration_id
                     ? 'Đang xử lý...'
@@ -403,7 +401,7 @@ const StudentDashboard = () => {
                   disabled={
                     Number(selectedWorkshop.available_seats) <= 0 || busyId === selectedWorkshop.id
                   }
-                  className="rounded-full bg-brand-500 px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-600 disabled:opacity-60"
+                  className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-60"
                 >
                   {Number(selectedWorkshop.available_seats) <= 0
                     ? 'Hết chỗ'

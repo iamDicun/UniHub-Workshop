@@ -30,51 +30,51 @@ const AdminPayments = () => {
   }, []);
 
   return (
-    <PageShell title="Quản lý giao dịch" subtitle="Theo dõi toàn bộ giao dịch thanh toán trên hệ thống">
-      <div className="bg-white shadow overflow-hidden sm:rounded-lg border border-brand-200">
+    <PageShell title="Quản lý Giao dịch" subtitle="Theo dõi toàn bộ giao dịch thanh toán trên hệ thống">
+      <div className="overflow-hidden rounded-xl border border-border bg-surface shadow-soft">
         {loading ? (
-          <div className="p-8 text-center text-gray-500">Đang tải...</div>
+          <div className="p-8 text-center text-sm text-text-secondary">Đang tải...</div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Mã ĐH</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Sinh viên</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Workshop</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Số tiền</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Trạng thái</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Cập nhật</th>
+            <table className="min-w-full divide-y divide-border">
+              <thead>
+                <tr className="bg-background">
+                  <th className="px-4 py-3 text-left text-xs font-medium text-text-secondary">Mã ĐH</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-text-secondary">Sinh viên</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-text-secondary">Workshop</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-text-secondary">Số tiền</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-text-secondary">Trạng thái</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-text-secondary">Cập nhật</th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody className="divide-y divide-border">
                 {payments.length === 0 ? (
                   <tr>
-                    <td colSpan="6" className="px-6 py-4 text-center text-gray-500">Không có giao dịch nào.</td>
+                    <td colSpan="6" className="px-4 py-8 text-center text-sm text-text-secondary">Không có giao dịch nào.</td>
                   </tr>
                 ) : (
                   payments.map(payment => (
-                    <tr key={payment.id}>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                    <tr key={payment.id} className="hover:bg-hover transition-colors">
+                      <td className="px-4 py-3 whitespace-nowrap text-sm font-medium text-primary">
                         {payment.order_code}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        <div className="font-semibold">{payment.student_name}</div>
-                        <div className="text-xs text-gray-500">{payment.student_email}</div>
+                      <td className="px-4 py-3 whitespace-nowrap text-sm text-primary">
+                        <div className="font-medium">{payment.student_name}</div>
+                        <div className="text-xs text-text-secondary">{payment.student_email}</div>
                       </td>
-                      <td className="px-6 py-4 text-sm text-gray-500 max-w-xs truncate">
+                      <td className="px-4 py-3 text-sm text-text-secondary max-w-xs truncate">
                         {payment.workshop_title}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      <td className="px-4 py-3 whitespace-nowrap text-sm text-primary">
                         {Number(payment.amount).toLocaleString('vi-VN')} VND
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm">
-                        {payment.status === 'paid' && <span className="text-green-600 font-semibold bg-green-50 px-2 py-1 rounded-full">Thành công</span>}
-                        {payment.status === 'pending' && <span className="text-yellow-600 font-semibold bg-yellow-50 px-2 py-1 rounded-full">Chờ thanh toán</span>}
-                        {payment.status === 'failed' && <span className="text-red-600 font-semibold bg-red-50 px-2 py-1 rounded-full">Thất bại</span>}
-                        {payment.status === 'expired' && <span className="text-gray-600 font-semibold bg-gray-100 px-2 py-1 rounded-full">Hết hạn</span>}
+                      <td className="px-4 py-3 whitespace-nowrap text-sm">
+                        {payment.status === 'paid' && <span className="inline-flex rounded-lg bg-success/10 px-2 py-0.5 text-xs font-medium text-success">Thành công</span>}
+                        {payment.status === 'pending' && <span className="inline-flex rounded-lg bg-warning/10 px-2 py-0.5 text-xs font-medium text-warning">Chờ thanh toán</span>}
+                        {payment.status === 'failed' && <span className="inline-flex rounded-lg bg-error/10 px-2 py-0.5 text-xs font-medium text-error">Thất bại</span>}
+                        {payment.status === 'expired' && <span className="inline-flex rounded-lg bg-hover px-2 py-0.5 text-xs font-medium text-text-secondary">Hết hạn</span>}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <td className="px-4 py-3 whitespace-nowrap text-sm text-text-secondary">
                         {formatDateTime(payment.created_at)}
                       </td>
                     </tr>

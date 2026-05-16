@@ -23,36 +23,36 @@ const Modal = ({ isOpen, title, description, onClose, children, size = 'lg' }) =
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center px-4 py-6">
       <div
-        className="absolute inset-0 bg-brand-900/30 backdrop-blur-sm"
+        className="absolute inset-0 bg-primary/15"
         onClick={onClose}
         role="button"
         tabIndex={-1}
         aria-label="Đóng modal"
       />
       <div
-        className={`relative w-full ${widthClass} animate-rise rounded-3xl border border-brand-200/70 bg-white/95 p-6 shadow-[0_40px_90px_-60px_rgba(15,76,92,0.6)]`}
+        className={`relative flex max-h-[85vh] w-full flex-col ${widthClass} animate-rise rounded-xl border border-border bg-surface shadow-modal`}
         role="dialog"
         aria-modal="true"
         aria-label={title || 'Modal'}
       >
-        <div className="flex items-start justify-between gap-4">
+        <div className="flex shrink-0 items-start justify-between gap-4 px-6 pt-6">
           <div>
             {title ? (
-              <h2 className="font-display text-2xl font-semibold text-brand-900">{title}</h2>
+              <h2 className="font-display text-xl font-semibold text-primary">{title}</h2>
             ) : null}
             {description ? (
-              <p className="mt-1 text-sm text-brand-900/70">{description}</p>
+              <p className="mt-1 text-sm text-text-secondary">{description}</p>
             ) : null}
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="rounded-full border border-brand-200 px-3 py-2 text-xs font-semibold text-brand-700 transition hover:border-brand-500 hover:text-brand-900"
+            className="rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-text-secondary transition-colors hover:bg-hover hover:text-primary"
           >
             Đóng
           </button>
         </div>
-        <div className="mt-5 grid gap-5">{children}</div>
+        <div className="mt-5 grid gap-5 overflow-y-auto px-6 pb-6">{children}</div>
       </div>
     </div>
   );

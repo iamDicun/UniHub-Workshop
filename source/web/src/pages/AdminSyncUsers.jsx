@@ -43,7 +43,7 @@ const AdminSyncUsers = () => {
       const mimeType = type || 'text/csv';
 
       const uploadData = await getPresignedUrl(name, mimeType, size);
-      
+
       setUploadStatus('Đang upload file lên S3...');
       await axios.put(uploadData.uploadUrl, file, {
         headers: { 'Content-Type': mimeType },
@@ -71,46 +71,46 @@ const AdminSyncUsers = () => {
 
   return (
     <PageShell
-      title="Đồng bộ sinh viên"
-      subtitle="Quản lý việc đưa danh sách sinh viên từ file CSV vào Database hệ thống UniHub."
+      title="Đồng bộ Sinh viên"
+      subtitle="Quản lý việc đưa danh sách sinh viên từ file CSV vào Database."
     >
       <div className="grid gap-6 md:grid-cols-2">
-        <div className="rounded-3xl border border-brand-200 bg-white p-6 shadow-sm">
-          <h2 className="text-xl font-semibold mb-4 text-brand-900">Upload CSV Mới</h2>
+        <div className="rounded-xl border border-border bg-surface p-6 shadow-soft">
+          <h2 className="font-display text-lg font-semibold text-primary mb-4">Upload CSV Mới</h2>
           <div className="flex flex-col gap-4">
-            <div>
-              <label className="block text-sm font-medium text-brand-900 mb-1">
+            <div className="flex flex-col gap-1.5">
+              <label className="text-sm font-medium text-primary">
                 Chọn file CSV
               </label>
-              <input 
-                type="file" 
+              <input
+                type="file"
                 accept=".csv"
                 onChange={handleFileChange}
-                className="block w-full text-sm text-brand-900 border border-brand-200 rounded-lg cursor-pointer bg-brand-50 focus:outline-none p-2"
+                className="w-full rounded-lg border border-border bg-background p-2 text-sm text-text-secondary file:mr-4 file:rounded-lg file:border-0 file:bg-hover file:px-4 file:py-1.5 file:text-sm file:font-medium file:text-primary hover:file:bg-border transition-colors"
               />
             </div>
-            
+
             <div className="flex items-center gap-2">
-              <input 
-                type="checkbox" 
+              <input
+                type="checkbox"
                 id="immediateSync"
                 checked={isImmediate}
                 onChange={(e) => setIsImmediate(e.target.checked)}
-                className="w-4 h-4 text-brand-600 bg-gray-100 border-gray-300 rounded focus:ring-brand-500"
+                className="h-4 w-4 rounded border-border text-accent focus:ring-accent"
               />
-              <label htmlFor="immediateSync" className="text-sm font-medium text-brand-900">
+              <label htmlFor="immediateSync" className="text-sm font-medium text-primary">
                 Chạy đồng bộ ngay lập tức (Sync Now)
               </label>
             </div>
-            <p className="text-xs text-brand-600">
+            <p className="text-xs text-text-secondary">
               * Nếu không chọn, dữ liệu sẽ được lưu và tự động cập nhật vào ban đêm (Nightly Cron).
             </p>
 
             <button
               onClick={handleUploadAndSync}
               disabled={loading || !file}
-              className={`rounded-xl px-4 py-3 font-semibold text-white transition mt-2 ${
-                loading || !file ? 'bg-gray-400 cursor-not-allowed' : 'bg-brand-600 hover:bg-brand-700'
+              className={`rounded-lg px-4 py-2.5 text-sm font-medium text-white transition-opacity ${
+                loading || !file ? 'cursor-not-allowed opacity-50 bg-text-secondary' : 'bg-primary hover:opacity-90'
               }`}
             >
               {loading ? uploadStatus : 'Upload & Tạo Job'}
@@ -118,52 +118,52 @@ const AdminSyncUsers = () => {
           </div>
         </div>
 
-        <div className="rounded-3xl border border-brand-200 bg-white p-6 shadow-sm flex flex-col h-[500px]">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-semibold text-brand-900">Lịch sử Đồng bộ</h2>
-            <button 
+        <div className="flex flex-col rounded-xl border border-border bg-surface p-6 shadow-soft h-[500px]">
+          <div className="mb-4 flex items-center justify-between">
+            <h2 className="font-display text-lg font-semibold text-primary">Lịch sử Đồng bộ</h2>
+            <button
               onClick={loadJobs}
-              className="text-sm font-semibold text-brand-600 hover:text-brand-900"
+              className="text-sm font-medium text-accent transition-colors hover:text-primary"
             >
               Làm mới
             </button>
           </div>
-          
-          <div className="flex-1 overflow-auto rounded-xl border border-brand-100">
-            <table className="min-w-full text-left text-sm text-brand-900">
-              <thead className="sticky top-0 bg-brand-50 text-xs uppercase text-brand-700">
+
+          <div className="flex-1 overflow-auto rounded-lg border border-border">
+            <table className="min-w-full text-left text-sm text-primary">
+              <thead className="sticky top-0 bg-background text-xs text-text-secondary">
                 <tr>
-                  <th className="px-4 py-3">Trạng thái</th>
-                  <th className="px-4 py-3">Loại</th>
-                  <th className="px-4 py-3">Tạo lúc</th>
-                  <th className="px-4 py-3">Hoàn thành</th>
+                  <th className="px-4 py-3 font-medium">Trạng thái</th>
+                  <th className="px-4 py-3 font-medium">Loại</th>
+                  <th className="px-4 py-3 font-medium">Tạo lúc</th>
+                  <th className="px-4 py-3 font-medium">Hoàn thành</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-brand-100 bg-white">
+              <tbody className="divide-y divide-border bg-surface">
                 {jobs.map((job) => (
-                  <tr key={job.id} className="hover:bg-brand-50/50">
+                  <tr key={job.id} className="hover:bg-hover transition-colors">
                     <td className="px-4 py-3 font-medium">
-                      <span className={`px-2 py-1 rounded text-xs ${
-                        job.status === 'Completed' ? 'bg-green-100 text-green-700' :
-                        job.status === 'Failed' ? 'bg-red-100 text-red-700' :
-                        job.status === 'Processing' ? 'bg-blue-100 text-blue-700' :
-                        'bg-orange-100 text-orange-700'
+                      <span className={`inline-flex rounded-lg px-2 py-0.5 text-xs font-medium ${
+                        job.status === 'Completed' ? 'bg-success/10 text-success' :
+                        job.status === 'Failed' ? 'bg-error/10 text-error' :
+                        job.status === 'Processing' ? 'bg-accent/10 text-accent' :
+                        'bg-warning/10 text-warning'
                       }`}>
                         {job.status}
                       </span>
                     </td>
-                    <td className="px-4 py-3">
+                    <td className="px-4 py-3 text-text-secondary">
                       {job.is_immediate ? 'Tức thời' : 'Cron (Night)'}
                     </td>
-                    <td className="px-4 py-3">{new Date(job.created_at).toLocaleString('vi-VN')}</td>
-                    <td className="px-4 py-3 text-brand-500">
+                    <td className="px-4 py-3 text-text-secondary">{new Date(job.created_at).toLocaleString('vi-VN')}</td>
+                    <td className="px-4 py-3 text-text-secondary">
                       {job.finished_at ? new Date(job.finished_at).toLocaleString('vi-VN') : '-'}
                     </td>
                   </tr>
                 ))}
                 {jobs.length === 0 && (
                   <tr>
-                    <td colSpan="4" className="px-4 py-8 text-center text-brand-500">
+                    <td colSpan="4" className="px-4 py-8 text-center text-sm text-text-secondary">
                       Chưa có dữ liệu đồng bộ
                     </td>
                   </tr>

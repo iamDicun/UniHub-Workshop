@@ -28,12 +28,12 @@ const HtmlEditor = ({ value, onChange }) => {
   ];
 
   return (
-    <div className="bg-white rounded-2xl overflow-hidden border border-brand-200 focus-within:border-brand-500">
+    <div className="overflow-hidden rounded-lg border border-border bg-surface focus-within:border-accent transition-colors duration-150">
       <style>{`
-        .ql-toolbar { border: none !important; border-bottom: 1px solid #e5e7eb !important; background: #f8fafc; }
+        .ql-toolbar { border: none !important; border-bottom: 1px solid #EAE7E1 !important; background: #FAF8F4; }
         .ql-container { border: none !important; min-height: 200px; }
-        .ql-editor { font-family: inherit; font-size: 0.875rem; line-height: 1.6; }
-        .ql-editor.ql-blank::before { color: #94a3b8; font-style: normal; }
+        .ql-editor { font-family: inherit; font-size: 0.875rem; line-height: 1.6; color: #111111; }
+        .ql-editor.ql-blank::before { color: #6B7280; font-style: normal; }
       `}</style>
       <ReactQuill
         theme="snow"

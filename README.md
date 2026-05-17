@@ -38,6 +38,7 @@ npm run dev
 | Redis | localhost:6379 |
 
 > Database: Supabase (đã cấu hình sẵn trong .env)
+Database không cần phải cài đặt gì cả, supabase đã được làm sẵn và kết nối sẵn trong .env
 
 ---
 
@@ -139,6 +140,7 @@ source/
 ├── web/        # Frontend React + Vite
 ├── app/        # Mobile App React Native (Expo)
 ├── config/     # Nginx config
+├── data        # script schema + data (Supabase)
 ├── .docker/    # Dockerfiles
 ├── .env        # Biến môi trường (đã cấu hình)
 └── docker-compose.yml

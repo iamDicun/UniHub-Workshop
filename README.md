@@ -59,30 +59,35 @@ https://drive.google.com/file/d/1x2DcXRxL3Ge0O22MfJiXwPrtU0G9TPhM/view?usp=shari
 
 ---
 
-## 📱 Mobile App (QR Check-in)
+## 📱 Hướng dẫn Deploy Mobile App (QR Check-in) lên Điện thoại
 
-### Yêu cầu
-- Node.js 20+
-- Expo CLI: `npm install -g expo-cli`
-- Expo Go app trên điện thoại (iOS/Android)
+Để chạy được App quét QR trên điện thoại thật của bạn, hãy làm đúng theo các bước sau:
 
-### Cài đặt và chạy
+### 1. Chuẩn bị mạng và Tường lửa
+- **Mạng Wifi:** Đảm bảo Điện thoại và Máy tính (chạy Docker/Backend) phải kết nối chung vào **cùng một mạng Wifi**.
+- **Tường lửa (Firewall):** Tắt tạm thời Windows Defender Firewall hoặc đảm bảo đã cấp quyền (Allow) cho Node.js và cổng 80, 3000, 19000 đi qua tường lửa.
 
-```bash
-cd source/app
-npm install
-npm start    # Hiện QR code → scan bằng Expo Go
-```
+### 2. Cấu hình IP Máy tính
+- Mở Terminal/CMD gõ `ipconfig` (Windows) hoặc `ifconfig` (Mac/Linux) để lấy địa chỉ **IPv4 Address** (ví dụ: `192.168.1.7`).
+- Vào thư mục `source/app/`, tạo file `.env` (nếu chưa có) và dán nội dung sau:
+  ```env
+  EXPO_PUBLIC_API_URL=http://<IP_MÁY_TÍNH_CỦA_BẠN>/api
+  ```
+  *(Thay `<IP_MÁY_TÍNH_CỦA_BẠN>` bằng số IP vừa lấy)*
 
-### Cấu hình API URL cho mobile
+### 3. Khởi chạy App
+- Đảm bảo bạn đã cài ứng dụng **Expo Go** trên điện thoại (tải từ App Store hoặc Google Play).
+- Mở terminal tại thư mục gốc của project:
+  ```bash
+  cd source/app
+  npm install
+  npm start
+  ```
 
-Mở file `source/app/.env`:
-```
-# Thay localhost bằng IP máy tính của bạn trong mạng LAN
-EXPO_PUBLIC_API_URL=http://192.168.x.x/api
-```
-
-> Tìm IP: `ipconfig` (Windows) → IPv4 Address
+### 4. Kết nối Điện thoại
+1. Khi terminal (hoặc trình duyệt) hiện lên một mã QR lớn.
+2. Dùng Camera của điện thoại (với iOS) hoặc mở app Expo Go lên chọn "Scan QR Code" (với Android) để quét mã này.
+3. **⚠️ QUAN TRỌNG:** Khi màn hình điện thoại hiện lên yêu cầu đăng nhập, bạn **phải chọn nút "Proceed anonymously"** (Tiếp tục ẩn danh) ở dưới cùng. App sẽ lập tức tải bundle và khởi chạy!
 
 ---
 

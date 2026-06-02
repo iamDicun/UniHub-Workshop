@@ -36,7 +36,9 @@ Kết quả cần đạt ở bước này là bạn có 1 EC2 với 1 địa ch�
 1. Trỏ `A record` đó về Elastic IP của EC2.
 1. Bật proxy của Cloudflare cho record đó để ẩn origin IP.
 1. Nếu cần chống DDoS tốt hơn, chỉ cho phép IP range của Cloudflare vào Security Group của EC2.
-1. Nếu dùng HTTPS, cấu hình SSL/TLS trên Cloudflare ở mức `Full` hoặc `Full (strict)`.
+1. Nếu muốn dùng `Full (strict)`, tạo Cloudflare Origin Certificate cho `api.yourdomain.com` và cài lên EC2.
+1. Đặt file cert và key vào thư mục `source/certs/` trên EC2 với tên `origin.crt` và `origin.key`.
+1. Nếu chưa cài cert origin thì chỉ dùng tạm `Full`, không dùng `Full (strict)`.
 
 Kết quả cần đạt là người dùng chỉ truy cập qua domain, không truy cập trực tiếp vào IP thô.
 
@@ -84,6 +86,12 @@ sudo usermod -aG docker $USER
 docker --version
 docker compose version
 git --version
+```
+
+1. Tạo thư mục chứa cert cho Nginx:
+
+```bash
+mkdir -p ~/UniHub-Workshop/source/certs
 ```
 
 ## Bước 5. Clone source backend
@@ -146,6 +154,15 @@ Kết quả cần đạt là backend đọc được env production ngay khi con
 docker compose -f docker-compose.prod.yml up -d --build
 ```
 
+1. Nếu bạn đang dùng Cloudflare `Full strict`, đảm bảo có đủ 2 file sau trên EC2:
+
+```bash
+~/UniHub-Workshop/source/certs/origin.crt
+~/UniHub-Workshop/source/certs/origin.key
+```
+
+1. Nếu chưa có cert, hãy cài xong cert rồi mới bật `Full strict`, nếu không Nginx sẽ không lên được.
+
 1. Kiểm tra container đã lên chưa:
 
 ```bash
@@ -158,7 +175,7 @@ docker compose -f docker-compose.prod.yml ps
 docker compose -f docker-compose.prod.yml logs -f
 ```
 
-Kết quả cần đạt là API chạy ổn trên EC2 và Nginx public ra ngoài qua port 80.
+Kết quả cần đạt là API chạy ổn trên EC2 và Nginx public ra ngoài qua port 80 lẫn 443.
 
 ## Bước 8. Deploy web lên Vercel
 
@@ -205,7 +222,7 @@ Kết quả cần đạt là browser trên Vercel upload hoặc tải file từ 
 
 1. Mở web trên Vercel.
 1. Đăng nhập thử.
-1. Gọi thử API qua domain `api.yourdomain.com`.
+1. Gọi thử API qua domain `https://api.yourdomain.com`.
 1. Kiểm tra upload file nếu ứng dụng có dùng S3.
 1. Kiểm tra payment flow nếu có PayOS.
 1. Kiểm tra log backend trên EC2 khi có request.

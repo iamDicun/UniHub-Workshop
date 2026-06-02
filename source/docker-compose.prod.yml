@@ -1,39 +1,58 @@
-version: '3.8'
-
 services:
   nginx:
     image: nginx:alpine
     ports:
       - "80:80"
     volumes:
-      - ./config/nginx.prod.conf:/etc/nginx/nginx.prod.conf:ro
+      - ./config/nginx.prod.conf:/etc/nginx/nginx.conf:ro
     depends_on:
       - api
     restart: unless-stopped
+    networks:
+      - unihub-network
 
   api:
     build:
       context: .
       dockerfile: .docker/api.Dockerfile
-
     env_file:
       - .env.production
-
     environment:
       - NODE_ENV=production
-
+      - PORT=3000
+      - REDIS_URL=redis://redis:6379
+      - RABBITMQ_URL=amqp://rabbitmq:5672
     depends_on:
-      - redis
-      - rabbitmq
-
+      redis:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
     restart: unless-stopped
+    networks:
+      - unihub-network
 
   redis:
     image: redis:7-alpine
     restart: unless-stopped
+    networks:
+      - unihub-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   rabbitmq:
     image: rabbitmq:3-management-alpine
-    ports:
-      - "15672:15672"
     restart: unless-stopped
+    networks:
+      - unihub-network
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "check_running"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+networks:
+  unihub-network:
+    driver: bridge
